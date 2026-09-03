@@ -1,0 +1,6 @@
+{
+  "name": "Zodiac Fusion Arena",
+  "description": "A mythic arena-action quest fusing your birth month zodiac and Chinese birth year animal into a cel-shaded guardian to battle through 12 celestial realms.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

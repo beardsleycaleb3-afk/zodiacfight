@@ -1,0 +1,2288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="manifest" href="manifest.json">
+  <title>Zodiac Fusion Arena</title>
+  <meta name="theme-color" content="#0F111A">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+    body, html {
+      width: 100%;
+      height: 100%;
+      background-color: #0F111A;
+      color: #E2E2E6;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      overflow: hidden;
+      position: fixed;
+    }
+    #game-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      background: radial-gradient(circle at 50% 40%, #171b29 0%, #0F111A 85%);
+      overflow: hidden;
+    }
+
+    /* TOP HUD */
+    .hud-top {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 12px 16px 8px;
+      background: linear-gradient(180deg, rgba(26,28,34,0.95) 0%, rgba(15,17,26,0) 100%);
+      z-index: 20;
+      pointer-events: none;
+    }
+    .hud-player {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      pointer-events: auto;
+    }
+    .player-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .lv-disc {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #D4AF37;
+      border: 2px solid #FFD700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px rgba(212,175,55,0.4);
+      color: #000;
+      font-weight: 800;
+      font-size: 11px;
+    }
+    .player-titles {
+      display: flex;
+      flex-direction: column;
+    }
+    .title-fusion {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: #9EA1A8;
+      font-weight: 600;
+    }
+    .title-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #FFF;
+    }
+    .bar-container {
+      width: 140px;
+      height: 8px;
+      background: #2D3139;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 4px;
+      position: relative;
+    }
+    .bar-player-hp {
+      height: 100%;
+      width: 100%;
+      background: #FF4B4B;
+      box-shadow: 0 0 8px rgba(255,75,75,0.6);
+      transition: width 0.15s ease-out;
+    }
+
+    .hud-realm {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      pointer-events: auto;
+    }
+    .realm-tag {
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: #1A1C22;
+      border: 1px solid #333741;
+      font-size: 10px;
+      color: #D4AF37;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .gate-number {
+      margin-top: 2px;
+      font-size: 20px;
+      font-weight: 300;
+      color: #6E727A;
+    }
+    .gate-number span {
+      color: #FFF;
+      font-weight: 700;
+    }
+
+    /* BOSS HUD */
+    .hud-boss {
+      position: absolute;
+      top: 14px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      z-index: 20;
+      pointer-events: none;
+      width: 220px;
+    }
+    .boss-phase-tag {
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.2em;
+      font-weight: 900;
+      color: #FFD700;
+    }
+    .boss-phase-tag.shadow {
+      color: #FF4444;
+      text-shadow: 0 0 8px rgba(255,68,68,0.7);
+    }
+    .boss-name {
+      font-size: 13px;
+      font-style: italic;
+      color: #FFF;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+      text-align: center;
+    }
+    .bar-boss-hp {
+      width: 180px;
+      height: 6px;
+      background: #1A1C22;
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 3px;
+      border: 1px solid #333741;
+    }
+    .bar-boss-fill {
+      height: 100%;
+      width: 100%;
+      background: #D4AF37;
+      box-shadow: 0 0 8px rgba(212,175,55,0.7);
+      transition: width 0.15s ease-out;
+    }
+    .bar-boss-fill.shadow {
+      background: #9B51E0;
+      box-shadow: 0 0 8px rgba(155,81,224,0.7);
+    }
+
+    /* CANVAS ARENA */
+    #arena-canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+
+    /* COMBAT CONTROLS FOOTER */
+    .controls-footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(180deg, rgba(22,24,29,0.88) 0%, rgba(15,17,26,0.98) 100%);
+      border-top: 1px solid #2D3139;
+      border-top-left-radius: 28px;
+      border-top-right-radius: 28px;
+      padding: 12px 18px 16px;
+      box-shadow: 0 -8px 30px rgba(0,0,0,0.5);
+      z-index: 20;
+    }
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 84px;
+    }
+
+    /* VIRTUAL STICK */
+    .stick-zone {
+      width: 84px;
+      height: 84px;
+      border-radius: 50%;
+      background: #1F2229;
+      border: 1px solid #2D3139;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      touch-action: none;
+    }
+    .stick-outer-ring {
+      position: absolute;
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      border: 1px solid rgba(212,175,55,0.2);
+      pointer-events: none;
+    }
+    .stick-knob {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: #333741;
+      border: 1px solid #444A55;
+      box-shadow: inset 0 2px 4px rgba(255,255,255,0.1), 0 4px 10px rgba(0,0,0,0.4);
+      position: absolute;
+      transform: translate(0px, 0px);
+      transition: transform 0.04s ease-out;
+      pointer-events: none;
+    }
+
+    /* ACTION BUTTONS */
+    .actions-group {
+      display: flex;
+      align-items: flex-end;
+      gap: 10px;
+    }
+    .btn-action-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+    .btn-action-label {
+      font-size: 9px;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #6E727A;
+    }
+    .btn-action-label.gold {
+      color: #D4AF37;
+    }
+    .btn-heal {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: #1A1C22;
+      border: 1px solid #333741;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #4EBA6F;
+      font-size: 16px;
+      cursor: pointer;
+      position: relative;
+    }
+    .heal-charges {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      background: #4EBA6F;
+      color: #000;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      font-size: 10px;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-dash {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: #2D3139;
+      border: 1px solid #444A55;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFF;
+      font-size: 20px;
+      cursor: pointer;
+      transition: transform 0.08s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-dash:active {
+      transform: scale(0.92);
+      background: #3a3f4a;
+    }
+    .btn-sign {
+      width: 66px;
+      height: 66px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #D4AF37 0%, #8B7026 100%);
+      padding: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 0 16px rgba(212,175,55,0.35);
+      position: relative;
+      margin-bottom: 4px;
+      transition: transform 0.08s ease;
+    }
+    .btn-sign:active {
+      transform: scale(0.92);
+    }
+    .btn-sign-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: #0F111A;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #D4AF37;
+      font-size: 26px;
+      font-weight: bold;
+      position: relative;
+      overflow: hidden;
+    }
+    .cooldown-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      clip-path: polygon(50% 50%, 50% 0, 50% 0, 50% 0, 50% 0);
+      pointer-events: none;
+      border-radius: 50%;
+    }
+    .btn-strike {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0F111A;
+      font-size: 22px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(255,255,255,0.25);
+      transition: transform 0.08s ease;
+    }
+    .btn-strike:active {
+      transform: scale(0.92);
+      background: #E0E0E0;
+    }
+
+    /* BOTTOM META NAV */
+    .controls-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 6px;
+      padding: 0 4px;
+    }
+    .shards-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .meta-label {
+      font-size: 8px;
+      text-transform: uppercase;
+      color: #6E727A;
+      letter-spacing: 0.1em;
+    }
+    .shard-gems {
+      display: flex;
+      gap: 4px;
+    }
+    .shard-gem {
+      width: 10px;
+      height: 10px;
+      background: #2D3139;
+      border-radius: 2px;
+      transform: rotate(45deg);
+      border: 1px solid #444A55;
+      transition: background 0.2s, box-shadow 0.2s;
+    }
+    .shard-gem.active {
+      background: #D4AF37;
+      border-color: #FFD700;
+      box-shadow: 0 0 6px rgba(255,215,0,0.7);
+    }
+    .meta-buttons {
+      display: flex;
+      gap: 8px;
+    }
+    .btn-pill {
+      padding: 4px 12px;
+      background: #1F2229;
+      border: 1px solid #2D3139;
+      border-radius: 999px;
+      font-size: 11px;
+      color: #E2E2E6;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .btn-pill:hover, .btn-pill:active {
+      background: #2D3139;
+      border-color: #D4AF37;
+    }
+
+    /* FULL SCREEN OVERLAYS / MODALS */
+    .overlay-screen {
+      position: absolute;
+      inset: 0;
+      background: rgba(15,17,26,0.96);
+      backdrop-filter: blur(12px);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      overflow-y: auto;
+    }
+    .overlay-screen.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* CREATION & FORGE SCREEN */
+    .modal-card {
+      background: #16181D;
+      border: 1px solid #2D3139;
+      border-radius: 20px;
+      padding: 24px;
+      max-width: 440px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.6);
+      text-align: center;
+    }
+    .modal-title {
+      font-size: 20px;
+      font-weight: 800;
+      color: #FFD700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .modal-subtitle {
+      font-size: 12px;
+      color: #9EA1A8;
+      margin-bottom: 18px;
+    }
+    .input-row {
+      display: flex;
+      gap: 12px;
+      width: 100%;
+      margin-bottom: 16px;
+    }
+    .input-group {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+    }
+    .input-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: #D4AF37;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+    }
+    select, input[type="number"] {
+      width: 100%;
+      padding: 10px 12px;
+      background: #1F2229;
+      border: 1px solid #333741;
+      border-radius: 10px;
+      color: #FFF;
+      font-size: 14px;
+      font-weight: 600;
+      outline: none;
+    }
+    select:focus, input[type="number"]:focus {
+      border-color: #D4AF37;
+      box-shadow: 0 0 8px rgba(212,175,55,0.3);
+    }
+    .preview-box {
+      width: 100%;
+      background: #12141A;
+      border: 1px dashed #333741;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-align: left;
+    }
+    .preview-emblem {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      background: #1F2229;
+      border: 2px solid #D4AF37;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      color: #FFD700;
+      flex-shrink: 0;
+    }
+    .preview-info h4 {
+      font-size: 14px;
+      color: #FFF;
+      font-weight: 700;
+    }
+    .preview-info p {
+      font-size: 11px;
+      color: #9EA1A8;
+      margin-top: 2px;
+      line-height: 1.35;
+    }
+    .btn-gold-primary {
+      width: 100%;
+      padding: 12px 20px;
+      background: linear-gradient(135deg, #FFD700 0%, #D4AF37 100%);
+      border: none;
+      border-radius: 999px;
+      color: #0F111A;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(212,175,55,0.4);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+    .btn-gold-primary:active {
+      transform: scale(0.97);
+    }
+
+    /* 5-SECOND ASSEMBLY SCREEN */
+    #assembly-overlay {
+      background: radial-gradient(circle at 50% 50%, #1c2233 0%, #0F111A 85%);
+      z-index: 60;
+    }
+    .assembly-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+    .assembly-rune-ring {
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      border: 2px dashed #D4AF37;
+      animation: spinRune 12s linear infinite;
+      position: absolute;
+      top: -30px;
+      opacity: 0.35;
+    }
+    @keyframes spinRune {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .assembly-avatar {
+      width: 160px;
+      height: 160px;
+      border-radius: 30px;
+      background: #16181D;
+      border: 2px solid #D4AF37;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 35px rgba(212,175,55,0.3);
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .assembly-glyph {
+      font-size: 58px;
+      color: #FFD700;
+      text-shadow: 0 0 15px rgba(255,215,0,0.6);
+      transition: transform 0.4s ease;
+    }
+    .assembly-animal {
+      font-size: 34px;
+      margin-top: -6px;
+    }
+    .assembly-step-text {
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: #D4AF37;
+      font-weight: 800;
+      margin-bottom: 6px;
+    }
+    .assembly-title {
+      font-size: 22px;
+      font-weight: 800;
+      color: #FFF;
+      margin-bottom: 6px;
+    }
+    .assembly-trait-desc {
+      font-size: 12px;
+      color: #9EA1A8;
+      max-width: 300px;
+      line-height: 1.4;
+      text-align: center;
+    }
+
+    /* CODEX MODAL (12x12 GRID) */
+    .codex-container {
+      width: 100%;
+      max-width: 580px;
+      max-height: 85vh;
+      background: #16181D;
+      border: 1px solid #2D3139;
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+    }
+    .codex-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid #2D3139;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #1A1C22;
+    }
+    .codex-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      padding: 16px;
+      overflow-y: auto;
+      max-height: 55vh;
+    }
+    @media(min-width: 480px) {
+      .codex-grid {
+        grid-template-columns: repeat(8, 1fr);
+      }
+    }
+    .codex-slot {
+      aspect-ratio: 1;
+      background: #1F2229;
+      border: 1px solid #333741;
+      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: border-color 0.15s, transform 0.1s;
+    }
+    .codex-slot:hover {
+      border-color: #D4AF37;
+      transform: translateY(-2px);
+    }
+    .codex-slot.locked {
+      opacity: 0.35;
+      filter: grayscale(1);
+    }
+    .codex-slot.unlocked {
+      background: linear-gradient(145deg, #1f232d 0%, #151820 100%);
+      border-color: rgba(212,175,55,0.4);
+    }
+    .codex-slot-icon {
+      font-size: 20px;
+    }
+    .codex-slot-label {
+      font-size: 8px;
+      color: #9EA1A8;
+      margin-top: 2px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 90%;
+    }
+
+    /* TUTORIAL SCREEN */
+    .tutorial-step-indicator {
+      display: flex;
+      gap: 6px;
+      margin-bottom: 14px;
+    }
+    .tut-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #2D3139;
+    }
+    .tut-dot.active {
+      background: #D4AF37;
+      box-shadow: 0 0 6px #FFD700;
+    }
+
+    /* SHARE CARD & VICTORY SCREEN */
+    .victory-card {
+      background: linear-gradient(180deg, #1E2129 0%, #12141A 100%);
+      border: 2px solid #D4AF37;
+      border-radius: 24px;
+      padding: 24px 20px;
+      max-width: 400px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 0 40px rgba(212,175,55,0.25);
+      text-align: center;
+      position: relative;
+    }
+    .victory-badge {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: #1F2229;
+      border: 3px solid #FFD700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 42px;
+      margin-bottom: 12px;
+      box-shadow: 0 0 25px rgba(255,215,0,0.4);
+    }
+    .victory-stats {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 16px 0;
+    }
+    .stat-pill {
+      background: #16181D;
+      border: 1px solid #2D3139;
+      border-radius: 12px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .stat-val {
+      font-size: 16px;
+      font-weight: 800;
+      color: #FFD700;
+    }
+    .stat-lbl {
+      font-size: 9px;
+      text-transform: uppercase;
+      color: #9EA1A8;
+      letter-spacing: 0.05em;
+    }
+
+    /* FLOATING COMBAT TEXT */
+    .floating-text {
+      position: absolute;
+      pointer-events: none;
+      font-weight: 900;
+      font-size: 15px;
+      animation: floatUp 0.6s ease-out forwards;
+      z-index: 30;
+    }
+    @keyframes floatUp {
+      0% { transform: translate(-50%, 0) scale(0.8); opacity: 1; }
+      100% { transform: translate(-50%, -35px) scale(1.1); opacity: 0; }
+    }
+
+    /* SHADOW TRANSFORMATION OVERLAY FX */
+    #shadow-flash {
+      position: absolute;
+      inset: 0;
+      background: rgba(155,81,224,0.35);
+      pointer-events: none;
+      opacity: 0;
+      z-index: 15;
+      transition: opacity 0.4s ease;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-container">
+    <!-- TOP HUD: REALM & VITAL INFO -->
+    <div class="hud-top">
+      <div class="hud-player">
+        <div class="player-badge">
+          <div class="lv-disc" id="hud-level">LV 24</div>
+          <div class="player-titles">
+            <span class="title-fusion" id="hud-fusion-title">Leo–Dragon</span>
+            <span class="title-name" id="hud-guardian-name">Guardian Prime</span>
+          </div>
+        </div>
+        <div class="bar-container">
+          <div class="bar-player-hp" id="hud-player-hp"></div>
+        </div>
+      </div>
+
+      <!-- BOSS HUD (TOP CENTER) -->
+      <div class="hud-boss" id="hud-boss" style="display: none;">
+        <span class="boss-phase-tag" id="hud-boss-phase">Guardian Phase</span>
+        <h2 class="boss-name" id="hud-boss-name">Aquarius–Tiger</h2>
+        <div class="bar-boss-hp">
+          <div class="bar-boss-fill" id="hud-boss-hp"></div>
+        </div>
+      </div>
+
+      <div class="hud-realm">
+        <div class="realm-tag" id="hud-realm-name">Realm of the Tiger</div>
+        <div class="gate-number">
+          Gate <span id="hud-gate-num">01</span>/12
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN ARENA CANVAS (3D / 2.5D CEL-SHADED ARENA) -->
+    <canvas id="arena-canvas"></canvas>
+    <div id="shadow-flash"></div>
+
+    <!-- COMBAT CONTROLS FOOTER -->
+    <div class="controls-footer">
+      <div class="controls-row">
+        <!-- VIRTUAL STICK (LEFT) -->
+        <div class="stick-zone" id="touch-stick-zone">
+          <div class="stick-outer-ring"></div>
+          <div class="stick-knob" id="touch-stick-knob"></div>
+        </div>
+
+        <!-- ACTION BUTTONS (RIGHT) -->
+        <div class="actions-group">
+          <!-- HEAL BUTTON -->
+          <div class="btn-action-wrapper">
+            <div class="btn-heal" id="btn-heal">
+              <span>💚</span>
+              <div class="heal-charges" id="heal-charges-count">1</div>
+            </div>
+            <span class="btn-action-label">Heal (E)</span>
+          </div>
+
+          <!-- DASH BUTTON -->
+          <div class="btn-action-wrapper">
+            <div class="btn-dash" id="btn-dash">
+              <span>✦</span>
+            </div>
+            <span class="btn-action-label">Dash</span>
+          </div>
+
+          <!-- PRIMARY CONSTELLATION TECHNIQUE -->
+          <div class="btn-action-wrapper">
+            <div class="btn-sign" id="btn-sign">
+              <div class="btn-sign-inner" id="btn-sign-icon">
+                <span>♌</span>
+                <div class="cooldown-overlay" id="sign-cooldown-overlay"></div>
+              </div>
+            </div>
+            <span class="btn-action-label gold" id="sign-tech-name">Roar (K)</span>
+          </div>
+
+          <!-- BASIC ATTACK CHAIN -->
+          <div class="btn-action-wrapper">
+            <div class="btn-strike" id="btn-strike">
+              <span>⚔️</span>
+            </div>
+            <span class="btn-action-label">Strike (J)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM META NAVIGATION -->
+      <div class="controls-meta">
+        <div class="shards-group">
+          <span class="meta-label">Shards</span>
+          <div class="shard-gems">
+            <div class="shard-gem" id="shard-1"></div>
+            <div class="shard-gem" id="shard-2"></div>
+            <div class="shard-gem" id="shard-3"></div>
+          </div>
+        </div>
+        <div class="meta-buttons">
+          <button class="btn-pill" id="btn-open-tutorial">🎓 Tutorial</button>
+          <button class="btn-pill" id="btn-open-codex">
+            <span style="color:#FFD700;">✦</span> Codex <span id="codex-counter" style="color:#9EA1A8;">0/144</span>
+          </button>
+          <button class="btn-pill" id="btn-reforge">⚙ Reforge</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. BIRTHDATE FUSION CREATION SCREEN -->
+    <div class="overlay-screen active" id="modal-creation">
+      <div class="modal-card">
+        <div style="font-size:32px; margin-bottom: 4px;">♌🐉</div>
+        <h2 class="modal-title">Forge Your Guardian</h2>
+        <p class="modal-subtitle">Derive your mythic champion from your birth month & Chinese birth year.</p>
+
+        <div class="input-row">
+          <div class="input-group">
+            <label class="input-label" for="select-month">Birth Month</label>
+            <select id="select-month">
+              <option value="1">January (Capricorn ♑)</option>
+              <option value="2">February (Aquarius ♒)</option>
+              <option value="3">March (Pisces ♓)</option>
+              <option value="4">April (Aries ♈)</option>
+              <option value="5">May (Taurus ♉)</option>
+              <option value="6">June (Gemini ♊)</option>
+              <option value="7">July (Cancer ♋)</option>
+              <option value="8" selected>August (Leo ♌)</option>
+              <option value="9">September (Virgo ♍)</option>
+              <option value="10">October (Libra ♎)</option>
+              <option value="11">November (Scorpio ♏)</option>
+              <option value="12">December (Sagittarius ♐)</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label class="input-label" for="input-year">Birth Year</label>
+            <input type="number" id="input-year" min="1900" max="2099" value="2000">
+          </div>
+        </div>
+
+        <div class="preview-box">
+          <div class="preview-emblem" id="preview-emblem">♌</div>
+          <div class="preview-info">
+            <h4 id="preview-fusion-title">Leo–Dragon Guardian</h4>
+            <p id="preview-fusion-desc">Active: Solar Roar cone burst • Passive: Dragon burning dash trail</p>
+          </div>
+        </div>
+
+        <p style="font-size:10px; color:#6E727A; margin-bottom:14px;">
+          Note: This uses a simplified month/year mythic fusion system for arena combat balance.
+        </p>
+
+        <button class="btn-gold-primary" id="btn-confirm-forge">Forge & Awaken Guardian</button>
+      </div>
+    </div>
+
+    <!-- 2. 5-SECOND ASSEMBLY SEQUENCE SCREEN -->
+    <div class="overlay-screen" id="assembly-overlay">
+      <div class="assembly-stage">
+        <div class="assembly-rune-ring"></div>
+        <div class="assembly-avatar">
+          <div class="assembly-glyph" id="assembly-glyph-display">♌</div>
+          <div class="assembly-animal" id="assembly-animal-display">🐉</div>
+        </div>
+        <span class="assembly-step-text" id="assembly-step-label">Step 1: Animal Mask Forged</span>
+        <h3 class="assembly-title" id="assembly-title-display">Leo–Dragon Guardian</h3>
+        <p class="assembly-trait-desc" id="assembly-trait-display">Imbued with dragon flames and celestial solar roar.</p>
+      </div>
+    </div>
+
+    <!-- 3. STEP-BY-STEP TUTORIAL MODAL -->
+    <div class="overlay-screen" id="modal-tutorial">
+      <div class="modal-card">
+        <div class="tutorial-step-indicator">
+          <div class="tut-dot active" id="tut-dot-1"></div>
+          <div class="tut-dot" id="tut-dot-2"></div>
+          <div class="tut-dot" id="tut-dot-3"></div>
+          <div class="tut-dot" id="tut-dot-4"></div>
+        </div>
+
+        <h2 class="modal-title" id="tut-title">1. Birthdate Fusion Mechanics</h2>
+        <div style="font-size: 38px; margin: 10px 0;" id="tut-icon">✨</div>
+        <p class="modal-subtitle" id="tut-desc" style="margin-bottom: 20px; line-height: 1.5;">
+          Your <strong>Birth Month</strong> grants your active Constellation Sign Technique (Leo Roar, Aries Rush, Pisces Bolts).<br><br>
+          Your <strong>Birth Year Animal</strong> dictates your movement silhouette, dash trait (Dragon fire streak, Rabbit double dash), and combat passive!
+        </p>
+
+        <div style="display:flex; gap:10px; width:100%;">
+          <button class="btn-pill" id="tut-btn-prev" style="flex:1; justify-content:center; display:none;">Back</button>
+          <button class="btn-gold-primary" id="tut-btn-next" style="flex:2;">Next Step</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. VISUAL CODEX MODAL (12x12 GRID = 144 COMBINATIONS) -->
+    <div class="overlay-screen" id="modal-codex">
+      <div class="codex-container">
+        <div class="codex-header">
+          <div>
+            <h3 style="font-size:16px; color:#FFD700; text-transform:uppercase; font-weight:800;">Zodiac Codex</h3>
+            <span style="font-size:11px; color:#9EA1A8;" id="codex-progress-label">0 / 144 Fusions Defeated</span>
+          </div>
+          <button class="btn-pill" id="btn-close-codex">✕ Close</button>
+        </div>
+        <div class="codex-grid" id="codex-grid">
+          <!-- Populated dynamically with 144 combinations -->
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. CODEX DETAIL POPUP -->
+    <div class="overlay-screen" id="modal-codex-detail">
+      <div class="modal-card">
+        <div class="preview-emblem" id="detail-emblem" style="width:70px; height:70px; font-size:36px; margin-bottom:12px;">♌</div>
+        <h3 class="modal-title" id="detail-title">Leo–Dragon Guardian</h3>
+        <span class="boss-phase-tag" id="detail-status" style="margin-bottom:10px;">Encountered & Defeated</span>
+        <p style="font-size:12px; color:#9EA1A8; margin-bottom:16px; line-height:1.5;" id="detail-lore">
+          A mythic fusion combining the fiery Solar Roar of Leo with the unyielding dragon fire trail.
+        </p>
+        <button class="btn-gold-primary" id="btn-close-detail">Return to Codex</button>
+      </div>
+    </div>
+
+    <!-- 6. VICTORY & SHARE SCREEN -->
+    <div class="overlay-screen" id="modal-victory">
+      <div class="victory-card">
+        <div class="victory-badge" id="vic-badge">🏆</div>
+        <h2 class="modal-title" style="color:#FFF;">Realm Conquered!</h2>
+        <p class="modal-subtitle" id="vic-sub">You have mastered the celestial gates!</p>
+
+        <div class="victory-stats">
+          <div class="stat-pill">
+            <span class="stat-val" id="vic-guardian-name">Leo–Dragon</span>
+            <span class="stat-lbl">Guardian</span>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-val" id="vic-time">04:12</span>
+            <span class="stat-lbl">Campaign Time</span>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-val" id="vic-defeats">0</span>
+            <span class="stat-lbl">Defeats</span>
+          </div>
+          <div class="stat-pill">
+            <span class="stat-val" id="vic-gates-cleared">12 / 12</span>
+            <span class="stat-lbl">Gates Cleared</span>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:8px; width:100%;">
+          <button class="btn-gold-primary" id="btn-download-share-card">📸 Download Share Card (PNG)</button>
+          <button class="btn-pill" id="btn-share-social" style="justify-content:center; padding:10px;">🔗 Share to Social Media</button>
+          <button class="btn-gold-primary" id="btn-next-realm" style="background:#2D3139; color:#FFF; border:1px solid #444A55;">
+            Advance to Next Realm
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HIDDEN CANVAS FOR HIGH-RES SOCIAL SHARE CARD GENERATION -->
+  <canvas id="share-card-canvas" width="1200" height="630" style="display:none;"></canvas>
+
+  <script>
+    /* =========================================================
+       ZODIAC FUSION ARENA - CORE ENGINE
+       ========================================================= */
+
+    // 12 Constellation Months (Sign, Name, Glyph, Element, Active Technique)
+    const ZODIAC_MONTHS = [
+      { id: 1, name: "Capricorn", glyph: "♑", element: "Earth", tech: "Stone Charge & Barrier", desc: "Dashes forward clad in granite, gaining a 2s damage shield." },
+      { id: 2, name: "Aquarius", glyph: "♒", element: "Air", tech: "Pushing Water Fan", desc: "Releases a 90° wave blast that knocks back and slows foes." },
+      { id: 3, name: "Pisces", glyph: "♓", element: "Water", tech: "Orbiting Twin Bolts", desc: "Summons twin astral orbs that seek and pierce enemies." },
+      { id: 4, name: "Aries", glyph: "♈", element: "Fire", tech: "Piercing Horn Rush", desc: "A rapid lance charge dealing heavy critical puncture damage." },
+      { id: 5, name: "Taurus", glyph: "♉", element: "Earth", tech: "Radial Ground Slam", desc: "Slams the celestial floor, causing a seismic shockwave." },
+      { id: 6, name: "Gemini", glyph: "♊", element: "Air", tech: "Echo Strike", desc: "Empowers next strike to instantly repeat itself as a starlight phantom." },
+      { id: 7, name: "Cancer", glyph: "♋", element: "Water", tech: "Timed Shell Counter", desc: "Enters parry stance: incoming hits trigger a lethal counter-burst." },
+      { id: 8, name: "Leo", glyph: "♌", element: "Fire", tech: "Solar Roar", desc: "Unleashes a blinding cone of solar energy that burns enemies." },
+      { id: 9, name: "Virgo", glyph: "♍", element: "Earth", tech: "Cleansing Heal Field", desc: "Sprouts a celestial glyph zone that restores health over time." },
+      { id: 10, name: "Libra", glyph: "♎", element: "Air", tech: "Balance Burst", desc: "Places dual karmic seals that detonate when hit." },
+      { id: 11, name: "Scorpio", glyph: "♏", element: "Water", tech: "Poison Tether", desc: "Hooks enemy with a venomous starlight tether dealing tick damage." },
+      { id: 12, name: "Sagittarius", glyph: "♐", element: "Fire", tech: "Star Volley", desc: "Fires a rapid spread of celestial piercing starlight arrows." }
+    ];
+
+    // 12 Chinese Zodiac Animals (repeating cycle anchored to 2020 = Rat)
+    const CHINESE_ANIMALS = [
+      { index: 0, name: "Rat", icon: "🐀", trait: "Quick sidestep & item magnet", effect: "rat_dodge" },
+      { index: 1, name: "Ox", icon: "🐂", trait: "15% damage resistance & heavy dash", effect: "ox_guard" },
+      { index: 2, name: "Tiger", icon: "🐅", trait: "3rd weapon combo hit deals +100% damage", effect: "tiger_fury" },
+      { index: 3, name: "Rabbit", icon: "🐇", trait: "Grants a second rapid dash charge", effect: "rabbit_dash" },
+      { index: 4, name: "Dragon", icon: "🐉", trait: "Dashes leave a trail of burning astral fire", effect: "dragon_fire" },
+      { index: 5, name: "Snake", icon: "🐍", trait: "Poison immunity & evasive slither dash", effect: "snake_evade" },
+      { index: 6, name: "Horse", icon: "🐎", trait: "+25% sustained movement speed", effect: "horse_speed" },
+      { index: 7, name: "Goat", icon: "🐐", trait: "Restores 20 HP after clearing each phase", effect: "goat_heal" },
+      { index: 8, name: "Monkey", icon: "🐒", trait: "Leaves a starlight decoy upon dodging", effect: "monkey_decoy" },
+      { index: 9, name: "Rooster", icon: "🐓", trait: "Sign techniques deal +30% critical damage", effect: "rooster_power" },
+      { index: 10, name: "Dog", icon: "🐕", trait: "Divine Aegis: absorbs first hit in each phase", effect: "dog_shield" },
+      { index: 11, name: "Pig", icon: "🐖", trait: "Landing full 3-hit combo heals 6 HP", effect: "pig_lifesteal" }
+    ];
+
+    // Web Audio Procedural Synthesizer
+    class AudioController {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+      }
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+      }
+      playTone(freq, type, duration, vol = 0.2) {
+        if (this.muted) return;
+        this.init();
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch(e) {}
+      }
+      playStrike(comboIndex) {
+        const freqs = [320, 440, 580];
+        this.playTone(freqs[comboIndex % 3], 'sawtooth', 0.12, 0.25);
+      }
+      playDash() {
+        this.playTone(220, 'sine', 0.15, 0.15);
+      }
+      playSign() {
+        this.playTone(660, 'triangle', 0.35, 0.3);
+      }
+      playHit() {
+        this.playTone(140, 'square', 0.12, 0.25);
+      }
+      playShadowTransform() {
+        this.playTone(80, 'sawtooth', 0.7, 0.4);
+      }
+      playHeal() {
+        this.playTone(523.25, 'sine', 0.2, 0.25);
+        setTimeout(() => this.playTone(659.25, 'sine', 0.3, 0.25), 100);
+      }
+      playFanfare() {
+        [440, 554, 659, 880].forEach((f, i) => {
+          setTimeout(() => this.playTone(f, 'triangle', 0.4, 0.3), i * 140);
+        });
+      }
+    }
+    const audio = new AudioController();
+
+    // Game State
+    const state = {
+      // Player Birth & Fusion
+      playerMonth: 8,
+      playerYear: 2000,
+      playerAnimalIndex: 4, // Dragon
+      guardianTitle: "Leo–Dragon Guardian Prime",
+
+      // Campaign Progression
+      currentRealmIndex: 2, // Tiger Realm
+      currentGate: 1, // 1 to 12
+      totalDefeats: 0,
+      campaignStartTime: Date.now(),
+      constellationShards: 0,
+      healingCharges: 1,
+      unlockedCodex: new Set(),
+
+      // Combat Entities
+      player: {
+        x: 0,
+        y: 60,
+        radius: 18,
+        hp: 100,
+        maxHp: 100,
+        speed: 3.4,
+        isDashing: false,
+        dashTimer: 0,
+        dashCooldown: 0,
+        signCooldown: 0,
+        comboStep: 0,
+        comboTimer: 0,
+        isAttacking: false,
+        attackCooldown: 0,
+        invulnerable: false,
+        facingAngle: -Math.PI / 2
+      },
+      enemy: null,
+      hazards: [],
+      particles: [],
+      floatingTexts: [],
+      dashTrails: [],
+
+      // Controls
+      joystick: { active: false, startX: 0, startY: 0, curX: 0, curY: 0, dx: 0, dy: 0 },
+      keys: {}
+    };
+
+    // Helper: Compute Chinese Animal from Year
+    function getAnimalIndexForYear(year) {
+      return ((year - 2020) % 12 + 12) % 12;
+    }
+
+    // Initialize Codex with some saved progress or defaults
+    try {
+      const savedCodex = localStorage.getItem('zodiac_fusion_codex');
+      if (savedCodex) {
+        JSON.parse(savedCodex).forEach(id => state.unlockedCodex.add(id));
+      }
+    } catch(e) {}
+
+    /* =========================================================
+       CANVAS & RENDERING ENGINE
+       ========================================================= */
+    const canvas = document.getElementById('arena-canvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    // Spawn Enemy for Current Gate & Realm
+    function spawnGateEnemy() {
+      const realmAnimal = CHINESE_ANIMALS[state.currentRealmIndex % 12];
+      const gateMonth = ZODIAC_MONTHS[(state.currentGate - 1) % 12];
+
+      state.enemy = {
+        name: `${gateMonth.name}–${realmAnimal.name}`,
+        month: gateMonth,
+        animal: realmAnimal,
+        x: 0,
+        y: -100,
+        radius: 24,
+        hp: 150,
+        maxHp: 150,
+        isShadow: false,
+        transforming: false,
+        speed: 1.8,
+        attackTimer: 0,
+        attackTelegraph: 0,
+        telegraphType: 'cone',
+        facingAngle: Math.PI / 2,
+        wobble: 0
+      };
+
+      // Update Boss HUD
+      const bossHud = document.getElementById('hud-boss');
+      bossHud.style.display = 'flex';
+      document.getElementById('hud-boss-name').textContent = state.enemy.name;
+      document.getElementById('hud-boss-phase').textContent = "Guardian Phase";
+      document.getElementById('hud-boss-phase').className = "boss-phase-tag";
+      document.getElementById('hud-boss-hp').className = "bar-boss-fill";
+      document.getElementById('hud-boss-hp').style.width = '100%';
+
+      document.getElementById('hud-realm-name').textContent = `Realm of the ${realmAnimal.name}`;
+      document.getElementById('hud-gate-num').textContent = String(state.currentGate).padStart(2, '0');
+    }
+
+    // Trigger Shadow Phase Transformation
+    function triggerShadowPhase() {
+      if (!state.enemy || state.enemy.isShadow) return;
+      state.enemy.transforming = true;
+      state.enemy.hp = 0;
+
+      // Flash & Audio
+      const flash = document.getElementById('shadow-flash');
+      flash.style.opacity = '1';
+      audio.playShadowTransform();
+
+      // Screen text
+      addFloatingText(state.enemy.x, state.enemy.y - 20, "SHADOW AWAKENING!", "#9B51E0");
+
+      setTimeout(() => {
+        if (!state.enemy) return;
+        state.enemy.isShadow = true;
+        state.enemy.transforming = false;
+        state.enemy.hp = 220;
+        state.enemy.maxHp = 220;
+        state.enemy.speed = 2.6;
+        flash.style.opacity = '0';
+
+        document.getElementById('hud-boss-phase').textContent = "Shadow Phase";
+        document.getElementById('hud-boss-phase').className = "boss-phase-tag shadow";
+        document.getElementById('hud-boss-hp').className = "bar-boss-fill shadow";
+        document.getElementById('hud-boss-hp').style.width = '100%';
+
+        // Spawn permanent realm zone hazard
+        state.hazards.push({
+          x: (Math.random() - 0.5) * 140,
+          y: (Math.random() - 0.5) * 140,
+          radius: 36,
+          pulse: 0
+        });
+      }, 1400);
+    }
+
+    // Record Defeat in Codex
+    function recordCodexEntry(monthId, animalIdx) {
+      const code = `${monthId}_${animalIdx}`;
+      state.unlockedCodex.add(code);
+      try {
+        localStorage.setItem('zodiac_fusion_codex', JSON.stringify(Array.from(state.unlockedCodex)));
+      } catch(e) {}
+      updateCodexCounter();
+    }
+
+    function updateCodexCounter() {
+      document.getElementById('codex-counter').textContent = `${state.unlockedCodex.size}/144`;
+      document.getElementById('codex-progress-label').textContent = `${state.unlockedCodex.size} / 144 Fusions Defeated`;
+    }
+
+    // Particle FX
+    function addParticle(x, y, color, size = 3, vx = 0, vy = 0) {
+      state.particles.push({ x, y, color, size, vx, vy, life: 1.0 });
+    }
+
+    function addFloatingText(x, y, text, color = "#FFF") {
+      const screenX = canvas.width / 2 + x;
+      const screenY = canvas.height / 2 + y;
+      const el = document.createElement('div');
+      el.className = 'floating-text';
+      el.textContent = text;
+      el.style.color = color;
+      el.style.left = `${screenX}px`;
+      el.style.top = `${screenY}px`;
+      document.getElementById('game-container').appendChild(el);
+      setTimeout(() => el.remove(), 600);
+    }
+
+    /* =========================================================
+       ACTION & COMBAT CONTROLS
+       ========================================================= */
+    function performStrike() {
+      const p = state.player;
+      if (p.attackCooldown > 0 || p.isDashing) return;
+
+      audio.playStrike(p.comboStep);
+      p.isAttacking = true;
+      p.attackCooldown = 0.28;
+      p.comboTimer = 0.7;
+
+      // Calculate strike hitbox
+      const reach = 48;
+      const hitX = p.x + Math.cos(p.facingAngle) * reach;
+      const hitY = p.y + Math.sin(p.facingAngle) * reach;
+
+      // Attack particles
+      for (let i = 0; i < 6; i++) {
+        addParticle(hitX, hitY, "#FFD700", 3, (Math.random()-0.5)*3, (Math.random()-0.5)*3);
+      }
+
+      // Check enemy hit
+      if (state.enemy && !state.enemy.transforming && state.enemy.hp > 0) {
+        const dist = Math.hypot(hitX - state.enemy.x, hitY - state.enemy.y);
+        if (dist < state.enemy.radius + 32) {
+          let dmg = 24 + p.comboStep * 12;
+          // Tiger passive: 3rd hit +100% damage
+          if (state.playerAnimalIndex === 2 && p.comboStep === 2) {
+            dmg *= 2;
+            addFloatingText(state.enemy.x, state.enemy.y - 10, "TIGER CRIT!", "#FFD700");
+          }
+          // Pig passive: heal on 3-hit combo
+          if (state.playerAnimalIndex === 11 && p.comboStep === 2) {
+            p.hp = Math.min(p.maxHp, p.hp + 6);
+            updatePlayerHpUI();
+          }
+
+          damageEnemy(dmg);
+        }
+      }
+
+      p.comboStep = (p.comboStep + 1) % 3;
+    }
+
+    function performDash() {
+      const p = state.player;
+      if (p.dashCooldown > 0) return;
+
+      audio.playDash();
+      p.isDashing = true;
+      p.dashTimer = 0.3;
+      p.dashCooldown = state.playerAnimalIndex === 3 ? 0.7 : 1.2; // Rabbit shorter cooldown
+      p.invulnerable = true;
+
+      // Dash trail
+      state.dashTrails.push({
+        x: p.x,
+        y: p.y,
+        angle: p.facingAngle,
+        isDragon: state.playerAnimalIndex === 4,
+        life: 0.6
+      });
+    }
+
+    function performSignTechnique() {
+      const p = state.player;
+      if (p.signCooldown > 0) return;
+
+      audio.playSign();
+      p.signCooldown = 6.0;
+
+      // Visual cooldown sweep
+      const overlay = document.getElementById('sign-cooldown-overlay');
+      overlay.style.clipPath = 'polygon(50% 50%, 50% 0, 100% 0, 100% 100%, 0 100%, 0 0, 50% 0)';
+
+      const month = ZODIAC_MONTHS[(state.playerMonth - 1) % 12];
+      addFloatingText(p.x, p.y - 30, month.tech, "#FFD700");
+
+      // Apply Technique Effect
+      if (month.id === 8) {
+        // Leo Solar Roar: wide cone burst
+        if (state.enemy && state.enemy.hp > 0) {
+          const dist = Math.hypot(state.enemy.x - p.x, state.enemy.y - p.y);
+          if (dist < 140) {
+            damageEnemy(45);
+            addFloatingText(state.enemy.x, state.enemy.y, "SOLAR BURN!", "#FF4444");
+          }
+        }
+      } else if (month.id === 1) {
+        // Capricorn stone barrier
+        p.invulnerable = true;
+        setTimeout(() => { p.invulnerable = false; }, 2000);
+      } else if (month.id === 9) {
+        // Virgo cleansing field
+        p.hp = Math.min(p.maxHp, p.hp + 35);
+        updatePlayerHpUI();
+        addFloatingText(p.x, p.y - 20, "+35 HEAL", "#4EBA6F");
+      } else {
+        // General technique hit
+        if (state.enemy && state.enemy.hp > 0) {
+          damageEnemy(40);
+        }
+      }
+    }
+
+    function performHeal() {
+      if (state.healingCharges > 0 && state.player.hp < state.player.maxHp) {
+        state.healingCharges--;
+        state.player.hp = Math.min(state.player.maxHp, state.player.hp + 40);
+        document.getElementById('heal-charges-count').textContent = state.healingCharges;
+        updatePlayerHpUI();
+        audio.playHeal();
+        addFloatingText(state.player.x, state.player.y - 20, "+40 HEAL", "#4EBA6F");
+      }
+    }
+
+    function damageEnemy(amount) {
+      if (!state.enemy || state.enemy.hp <= 0) return;
+      state.enemy.hp -= amount;
+      audio.playHit();
+      addFloatingText(state.enemy.x, state.enemy.y - 15, `-${amount}`, state.enemy.isShadow ? "#9B51E0" : "#FFD700");
+
+      const pct = Math.max(0, (state.enemy.hp / state.enemy.maxHp) * 100);
+      document.getElementById('hud-boss-hp').style.width = `${pct}%`;
+
+      if (state.enemy.hp <= 0) {
+        if (!state.enemy.isShadow) {
+          triggerShadowPhase();
+        } else {
+          onGateVictory();
+        }
+      }
+    }
+
+    function onGateVictory() {
+      audio.playFanfare();
+      recordCodexEntry(state.enemy.month.id, state.enemy.animal.index);
+
+      // Award shard
+      state.constellationShards++;
+      updateShardsUI();
+
+      // Check if realm finished (12 gates)
+      if (state.currentGate >= 12) {
+        showVictoryScreen();
+      } else {
+        addFloatingText(0, 0, "GATE CLEARED!", "#FFD700");
+        setTimeout(() => {
+          state.currentGate++;
+          spawnGateEnemy();
+        }, 1600);
+      }
+    }
+
+    function updateShardsUI() {
+      const s1 = document.getElementById('shard-1');
+      const s2 = document.getElementById('shard-2');
+      const s3 = document.getElementById('shard-3');
+      const count = state.constellationShards % 3;
+
+      s1.className = count >= 1 ? 'shard-gem active' : 'shard-gem';
+      s2.className = count >= 2 ? 'shard-gem active' : 'shard-gem';
+      s3.className = 'shard-gem';
+
+      if (state.constellationShards > 0 && state.constellationShards % 3 === 0) {
+        state.healingCharges = Math.min(3, state.healingCharges + 1);
+        document.getElementById('heal-charges-count').textContent = state.healingCharges;
+        addFloatingText(state.player.x, state.player.y - 25, "+1 HEAL CHARGE!", "#4EBA6F");
+      }
+    }
+
+    function updatePlayerHpUI() {
+      const pct = Math.max(0, (state.player.hp / state.player.maxHp) * 100);
+      document.getElementById('hud-player-hp').style.width = `${pct}%`;
+    }
+
+    function damagePlayer(dmg) {
+      const p = state.player;
+      if (p.invulnerable) return;
+
+      // Ox passive: 15% resistance
+      if (state.playerAnimalIndex === 1) {
+        dmg = Math.round(dmg * 0.85);
+      }
+
+      p.hp = Math.max(0, p.hp - dmg);
+      updatePlayerHpUI();
+      audio.playHit();
+      addFloatingText(p.x, p.y - 15, `-${dmg}`, "#FF4B4B");
+
+      if (p.hp <= 0) {
+        state.totalDefeats++;
+        addFloatingText(p.x, p.y, "DEFEATED - RESTARTING GATE", "#FF4444");
+        setTimeout(() => {
+          p.hp = p.maxHp;
+          updatePlayerHpUI();
+          spawnGateEnemy();
+        }, 1200);
+      }
+    }
+
+    /* =========================================================
+       MAIN GAME LOOP (60 FPS)
+       ========================================================= */
+    let lastTime = performance.now();
+
+    function gameLoop(now) {
+      const dt = Math.min(0.1, (now - lastTime) / 1000);
+      lastTime = now;
+
+      update(dt);
+      render();
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    function update(dt) {
+      const p = state.player;
+
+      // Movement calculation from Joystick & Keyboard
+      let moveX = 0;
+      let moveY = 0;
+
+      if (state.joystick.active) {
+        moveX = state.joystick.dx;
+        moveY = state.joystick.dy;
+      } else {
+        if (state.keys['KeyW'] || state.keys['ArrowUp']) moveY -= 1;
+        if (state.keys['KeyS'] || state.keys['ArrowDown']) moveY += 1;
+        if (state.keys['KeyA'] || state.keys['ArrowLeft']) moveX -= 1;
+        if (state.keys['KeyD'] || state.keys['ArrowRight']) moveX += 1;
+
+        const len = Math.hypot(moveX, moveY);
+        if (len > 0) {
+          moveX /= len;
+          moveY /= len;
+        }
+      }
+
+      // Horse passive: +25% speed
+      const baseSpeed = state.playerAnimalIndex === 6 ? p.speed * 1.25 : p.speed;
+
+      if (p.isDashing) {
+        p.dashTimer -= dt;
+        p.x += Math.cos(p.facingAngle) * baseSpeed * 2.8;
+        p.y += Math.sin(p.facingAngle) * baseSpeed * 2.8;
+
+        if (p.dashTimer <= 0) {
+          p.isDashing = false;
+          p.invulnerable = false;
+        }
+      } else if (Math.hypot(moveX, moveY) > 0.05) {
+        p.facingAngle = Math.atan2(moveY, moveX);
+        p.x += moveX * baseSpeed;
+        p.y += moveY * baseSpeed;
+      }
+
+      // Clamp Player in Circular Arena (radius 180)
+      const arenaRadius = 180;
+      const playerDist = Math.hypot(p.x, p.y);
+      if (playerDist > arenaRadius - p.radius) {
+        const ang = Math.atan2(p.y, p.x);
+        p.x = Math.cos(ang) * (arenaRadius - p.radius);
+        p.y = Math.sin(ang) * (arenaRadius - p.radius);
+      }
+
+      // Cooldown timers
+      if (p.dashCooldown > 0) p.dashCooldown -= dt;
+      if (p.attackCooldown > 0) p.attackCooldown -= dt;
+      if (p.comboTimer > 0) {
+        p.comboTimer -= dt;
+        if (p.comboTimer <= 0) p.comboStep = 0;
+      }
+      if (p.signCooldown > 0) {
+        p.signCooldown -= dt;
+        const pct = Math.max(0, p.signCooldown / 6.0);
+        const deg = Math.round(pct * 360);
+        document.getElementById('sign-cooldown-overlay').style.clipPath =
+          `polygon(50% 50%, 50% 0, ${deg > 180 ? '100% 0, 100% 100%, 0 100%, 0 0' : '100% 0, 100% 50%'}, 50% 0)`;
+      }
+
+      // Enemy AI & Telegraphs
+      const e = state.enemy;
+      if (e && !e.transforming && e.hp > 0) {
+        e.wobble += dt * 4;
+        const toPlayerX = p.x - e.x;
+        const toPlayerY = p.y - e.y;
+        const dist = Math.hypot(toPlayerX, toPlayerY);
+
+        if (dist > 45) {
+          e.facingAngle = Math.atan2(toPlayerY, toPlayerX);
+          e.x += (toPlayerX / dist) * e.speed;
+          e.y += (toPlayerY / dist) * e.speed;
+        }
+
+        // Enemy Attack Telegraph
+        e.attackTimer += dt;
+        if (e.attackTimer > (e.isShadow ? 1.8 : 2.5)) {
+          e.attackTelegraph += dt;
+          if (e.attackTelegraph > (e.isShadow ? 0.7 : 0.95)) {
+            // Strike player if in range
+            if (dist < 65) {
+              damagePlayer(e.isShadow ? 28 : 18);
+            }
+            e.attackTimer = 0;
+            e.attackTelegraph = 0;
+          }
+        }
+      }
+
+      // Hazard collision
+      state.hazards.forEach(h => {
+        h.pulse += dt * 3;
+        const d = Math.hypot(p.x - h.x, p.y - h.y);
+        if (d < h.radius) {
+          damagePlayer(1);
+        }
+      });
+
+      // Update Dash Trails
+      state.dashTrails.forEach((t, i) => {
+        t.life -= dt;
+        if (t.isDragon && e && e.hp > 0) {
+          const d = Math.hypot(e.x - t.x, e.y - t.y);
+          if (d < 30) damageEnemy(2);
+        }
+      });
+      state.dashTrails = state.dashTrails.filter(t => t.life > 0);
+
+      // Update Particles
+      state.particles.forEach(pt => {
+        pt.x += pt.vx;
+        pt.y += pt.vy;
+        pt.life -= dt * 1.5;
+      });
+      state.particles = state.particles.filter(pt => pt.life > 0);
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+
+      // 1. CELESTIAL CLOCK ARENA FLOOR
+      const arenaR = 190;
+
+      // Outer Glow
+      const grad = ctx.createRadialGradient(0, 0, arenaR * 0.4, 0, 0, arenaR);
+      grad.addColorStop(0, '#151822');
+      grad.addColorStop(0.85, '#10121A');
+      grad.addColorStop(1, '#0F111A');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(0, 0, arenaR, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Dashed and Solid Rings
+      ctx.strokeStyle = '#333741';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath();
+      ctx.arc(0, 0, arenaR * 0.9, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.strokeStyle = '#232733';
+      ctx.setLineDash([]);
+      ctx.beginPath();
+      ctx.arc(0, 0, arenaR * 0.65, 0, Math.PI * 2);
+      ctx.stroke();
+
+      // 12 Constellation Markers Around Arena Rim
+      for (let i = 0; i < 12; i++) {
+        const ang = (i / 12) * Math.PI * 2 - Math.PI / 2;
+        const mx = Math.cos(ang) * (arenaR - 16);
+        const my = Math.sin(ang) * (arenaR - 16);
+        ctx.fillStyle = 'rgba(212,175,55,0.35)';
+        ctx.font = '11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(ZODIAC_MONTHS[i].glyph, mx, my);
+      }
+
+      // 2. HAZARDS
+      state.hazards.forEach(h => {
+        ctx.fillStyle = 'rgba(155,81,224,0.18)';
+        ctx.beginPath();
+        ctx.arc(h.x, h.y, h.radius + Math.sin(h.pulse)*4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#9B51E0';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      });
+
+      // 3. DASH TRAILS (DRAGON FLAME ETC)
+      state.dashTrails.forEach(t => {
+        ctx.fillStyle = t.isDragon ? 'rgba(255,100,50,0.35)' : 'rgba(212,175,55,0.2)';
+        ctx.beginPath();
+        ctx.arc(t.x, t.y, 16 * t.life, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // 4. ENEMY TELEGRAPH (RED / VIOLET WARNING ZONE)
+      const e = state.enemy;
+      if (e && e.attackTelegraph > 0) {
+        ctx.fillStyle = e.isShadow ? 'rgba(155,81,224,0.3)' : 'rgba(255,75,75,0.25)';
+        ctx.strokeStyle = e.isShadow ? '#9B51E0' : '#FF4B4B';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, 60, e.facingAngle - 0.7, e.facingAngle + 0.7);
+        ctx.lineTo(e.x, e.y);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      // 5. ENEMY GUARDIAN (CEL-SHADED MYTHIC ENTITY)
+      if (e && e.hp > 0) {
+        ctx.save();
+        ctx.translate(e.x, e.y);
+
+        // Ground shadow ring
+        ctx.fillStyle = e.isShadow ? 'rgba(155,81,224,0.25)' : 'rgba(0,0,0,0.4)';
+        ctx.beginPath();
+        ctx.ellipse(0, 16, e.radius, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Aura
+        ctx.fillStyle = e.isShadow ? 'rgba(155,81,224,0.15)' : 'rgba(212,175,55,0.12)';
+        ctx.beginPath();
+        ctx.arc(0, 0, e.radius + 8, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Body Silhouette
+        ctx.fillStyle = e.isShadow ? '#1C1526' : '#1A1C22';
+        ctx.strokeStyle = e.isShadow ? '#9B51E0' : '#D4AF37';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(0, 0, e.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Overhead Zodiac Glyph & Animal Icon
+        ctx.font = '16px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(e.animal.icon, 0, 2);
+
+        ctx.fillStyle = e.isShadow ? '#FF4444' : '#FFD700';
+        ctx.font = '14px sans-serif';
+        ctx.fillText(e.month.glyph, 0, -26);
+
+        ctx.restore();
+      }
+
+      // 6. PLAYER GUARDIAN (CEL-SHADED MYTHIC GUARDIAN)
+      const p = state.player;
+      ctx.save();
+      ctx.translate(p.x, p.y);
+
+      // Ground Shadow
+      ctx.fillStyle = 'rgba(212,175,55,0.2)';
+      ctx.beginPath();
+      ctx.ellipse(0, 14, p.radius, 7, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Starlight Aura
+      ctx.fillStyle = 'rgba(212,175,55,0.15)';
+      ctx.beginPath();
+      ctx.arc(0, 0, p.radius + 6, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Guardian Body
+      ctx.fillStyle = '#1A1C22';
+      ctx.strokeStyle = p.invulnerable ? '#00E5FF' : '#FFD700';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.arc(0, 0, p.radius, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      // Facing Direction Weapon / Indicator
+      const wx = Math.cos(p.facingAngle) * 22;
+      const wy = Math.sin(p.facingAngle) * 22;
+      ctx.fillStyle = '#FFD700';
+      ctx.beginPath();
+      ctx.arc(wx, wy, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Zodiac Glyph Overhead
+      ctx.fillStyle = '#FFD700';
+      ctx.font = '16px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      const pMonth = ZODIAC_MONTHS[(state.playerMonth - 1) % 12];
+      ctx.fillText(pMonth.glyph, 0, -22);
+
+      // Animal Core Icon
+      const pAnimal = CHINESE_ANIMALS[state.playerAnimalIndex % 12];
+      ctx.font = '14px sans-serif';
+      ctx.fillText(pAnimal.icon, 0, 1);
+
+      ctx.restore();
+
+      // 7. PARTICLES
+      state.particles.forEach(pt => {
+        ctx.fillStyle = pt.color;
+        ctx.globalAlpha = pt.life;
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, pt.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1.0;
+
+      ctx.restore();
+    }
+
+    /* =========================================================
+       TOUCH & VIRTUAL STICK HANDLING
+       ========================================================= */
+    const stickZone = document.getElementById('touch-stick-zone');
+    const stickKnob = document.getElementById('touch-stick-knob');
+
+    function handleStickMove(clientX, clientY) {
+      const rect = stickZone.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const dx = clientX - centerX;
+      const dy = clientY - centerY;
+      const maxDist = rect.width / 2 - 10;
+      const dist = Math.hypot(dx, dy);
+      const angle = Math.atan2(dy, dx);
+      const clampedDist = Math.min(dist, maxDist);
+
+      const knobX = Math.cos(angle) * clampedDist;
+      const knobY = Math.sin(angle) * clampedDist;
+
+      stickKnob.style.transform = `translate(${knobX}px, ${knobY}px)`;
+      state.joystick.active = true;
+      state.joystick.dx = Math.cos(angle) * (clampedDist / maxDist);
+      state.joystick.dy = Math.sin(angle) * (clampedDist / maxDist);
+    }
+
+    function resetStick() {
+      stickKnob.style.transform = 'translate(0px, 0px)';
+      state.joystick.active = false;
+      state.joystick.dx = 0;
+      state.joystick.dy = 0;
+    }
+
+    stickZone.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      handleStickMove(e.touches[0].clientX, e.touches[0].clientY);
+    });
+    stickZone.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+      handleStickMove(e.touches[0].clientX, e.touches[0].clientY);
+    });
+    stickZone.addEventListener('touchend', resetStick);
+    stickZone.addEventListener('touchcancel', resetStick);
+
+    // Mouse fallback for joystick
+    let isMouseDownOnStick = false;
+    stickZone.addEventListener('mousedown', (e) => {
+      isMouseDownOnStick = true;
+      handleStickMove(e.clientX, e.clientY);
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (isMouseDownOnStick) handleStickMove(e.clientX, e.clientY);
+    });
+    window.addEventListener('mouseup', () => {
+      if (isMouseDownOnStick) {
+        isMouseDownOnStick = false;
+        resetStick();
+      }
+    });
+
+    // Button Bindings
+    document.getElementById('btn-strike').addEventListener('click', performStrike);
+    document.getElementById('btn-dash').addEventListener('click', performDash);
+    document.getElementById('btn-sign').addEventListener('click', performSignTechnique);
+    document.getElementById('btn-heal').addEventListener('click', performHeal);
+
+    // Keyboard Shortcuts
+    window.addEventListener('keydown', (e) => {
+      state.keys[e.code] = true;
+      if (e.code === 'KeyJ') performStrike();
+      if (e.code === 'Space') performDash();
+      if (e.code === 'KeyK') performSignTechnique();
+      if (e.code === 'KeyE') performHeal();
+    });
+    window.addEventListener('keyup', (e) => {
+      state.keys[e.code] = false;
+    });
+
+    /* =========================================================
+       CREATION & 5-SECOND ASSEMBLY SEQUENCE
+       ========================================================= */
+    const monthSelect = document.getElementById('select-month');
+    const yearInput = document.getElementById('input-year');
+
+    function updateCreationPreview() {
+      const mVal = parseInt(monthSelect.value);
+      const yVal = parseInt(yearInput.value) || 2000;
+      const month = ZODIAC_MONTHS[mVal - 1];
+      const aIdx = getAnimalIndexForYear(yVal);
+      const animal = CHINESE_ANIMALS[aIdx];
+
+      document.getElementById('preview-emblem').textContent = month.glyph;
+      document.getElementById('preview-fusion-title').textContent = `${month.name}–${animal.name} Guardian`;
+      document.getElementById('preview-fusion-desc').textContent = `Active: ${month.tech} • Passive: ${animal.trait}`;
+    }
+
+    monthSelect.addEventListener('change', updateCreationPreview);
+    yearInput.addEventListener('input', updateCreationPreview);
+    updateCreationPreview();
+
+    document.getElementById('btn-confirm-forge').addEventListener('click', () => {
+      state.playerMonth = parseInt(monthSelect.value);
+      state.playerYear = parseInt(yearInput.value) || 2000;
+      state.playerAnimalIndex = getAnimalIndexForYear(state.playerYear);
+
+      const m = ZODIAC_MONTHS[state.playerMonth - 1];
+      const a = CHINESE_ANIMALS[state.playerAnimalIndex];
+      state.guardianTitle = `${m.name}–${a.name} Guardian Prime`;
+
+      // Close creation modal & start 5-second cinematic assembly
+      document.getElementById('modal-creation').classList.remove('active');
+      trigger5SecondAssembly(m, a);
+    });
+
+    function trigger5SecondAssembly(month, animal) {
+      const overlay = document.getElementById('assembly-overlay');
+      overlay.classList.add('active');
+
+      const stepLabel = document.getElementById('assembly-step-label');
+      const glyphDisplay = document.getElementById('assembly-glyph-display');
+      const animalDisplay = document.getElementById('assembly-animal-display');
+      const titleDisplay = document.getElementById('assembly-title-display');
+      const traitDisplay = document.getElementById('assembly-trait-display');
+
+      glyphDisplay.textContent = "";
+      animalDisplay.textContent = animal.icon;
+      titleDisplay.textContent = `${animal.name} Mask Formed`;
+      stepLabel.textContent = "Beat 1: Animal Silhouette & Mask";
+      traitDisplay.textContent = `Imbued with ${animal.name} trait: ${animal.trait}`;
+      audio.playTone(180, 'sine', 0.5, 0.3);
+
+      // Beat 2 (1.6s)
+      setTimeout(() => {
+        stepLabel.textContent = "Beat 2: Constellation Armor Forged";
+        titleDisplay.textContent = "Starlight Armor Assembled";
+        traitDisplay.textContent = `Tempered by cosmic starlight resistance.`;
+        audio.playTone(360, 'triangle', 0.5, 0.3);
+      }, 1600);
+
+      // Beat 3 (3.2s)
+      setTimeout(() => {
+        stepLabel.textContent = "Beat 3: Zodiac Glyph Awakened";
+        glyphDisplay.textContent = month.glyph;
+        titleDisplay.textContent = state.guardianTitle;
+        traitDisplay.textContent = `Empowered with active constellation technique: ${month.tech}!`;
+        audio.playTone(540, 'sawtooth', 0.7, 0.35);
+      }, 3200);
+
+      // Finalize (5.0s)
+      setTimeout(() => {
+        overlay.classList.remove('active');
+        document.getElementById('hud-fusion-title').textContent = `${month.name}–${animal.name}`;
+        document.getElementById('hud-guardian-name').textContent = "Guardian Prime";
+        document.getElementById('btn-sign-icon').querySelector('span').textContent = month.glyph;
+        document.getElementById('sign-tech-name').textContent = month.name;
+
+        spawnGateEnemy();
+        audio.playFanfare();
+      }, 5000);
+    }
+
+    document.getElementById('btn-reforge').addEventListener('click', () => {
+      document.getElementById('modal-creation').classList.add('active');
+    });
+
+    /* =========================================================
+       STEP-BY-STEP TUTORIAL
+       ========================================================= */
+    const tutorialSteps = [
+      {
+        title: "1. Birthdate Fusion Mechanics",
+        icon: "✨",
+        desc: "Your <strong>Birth Month</strong> bestows your active Constellation Sign Technique (e.g. Leo Roar, Aquarius Fan).<br><br>Your <strong>Birth Year Animal</strong> grants your movement silhouette, dash trait (Dragon fire, Rabbit double dash), and combat passives!"
+      },
+      {
+        title: "2. Movement & Arena Navigation",
+        icon: "🕹️",
+        desc: "Navigate the circular celestial clock arena using the <strong>Virtual Analog Stick</strong> on the left, or <strong>W, A, S, D / Arrow Keys</strong> on desktop.<br><br>Observe the 12 engraved zodiac marks on the perimeter to gauge distance."
+      },
+      {
+        title: "3. 3-Hit Weapon Chain & Strike",
+        icon: "⚔️",
+        desc: "Tap <strong>Strike</strong> or press <strong>J / Left Click</strong> to unleash your weapon combo.<br><br>Combo hits deal escalating damage with crescent starlight hit-stops. Finishers trigger animal bonuses!"
+      },
+      {
+        title: "4. Dash & Sign Technique",
+        icon: "✦",
+        desc: "Tap <strong>Dash (Space)</strong> for a 0.3s burst with 0.18s invulnerability.<br><br>Tap your <strong>Zodiac Sign (K)</strong> to execute your signature ability on a 6s cooldown!"
+      }
+    ];
+
+    let currentTutStep = 0;
+    function renderTutStep() {
+      const step = tutorialSteps[currentTutStep];
+      document.getElementById('tut-title').textContent = step.title;
+      document.getElementById('tut-icon').innerHTML = step.icon;
+      document.getElementById('tut-desc').innerHTML = step.desc;
+
+      for (let i = 1; i <= 4; i++) {
+        document.getElementById(`tut-dot-${i}`).className = i - 1 === currentTutStep ? 'tut-dot active' : 'tut-dot';
+      }
+
+      document.getElementById('tut-btn-prev').style.display = currentTutStep > 0 ? 'block' : 'none';
+      document.getElementById('tut-btn-next').textContent = currentTutStep === 3 ? "Complete & Battle" : "Next Step";
+    }
+
+    document.getElementById('btn-open-tutorial').addEventListener('click', () => {
+      currentTutStep = 0;
+      renderTutStep();
+      document.getElementById('modal-tutorial').classList.add('active');
+    });
+    document.getElementById('tut-btn-prev').addEventListener('click', () => {
+      if (currentTutStep > 0) {
+        currentTutStep--;
+        renderTutStep();
+      }
+    });
+    document.getElementById('tut-btn-next').addEventListener('click', () => {
+      if (currentTutStep < 3) {
+        currentTutStep++;
+        renderTutStep();
+      } else {
+        document.getElementById('modal-tutorial').classList.remove('active');
+      }
+    });
+
+    /* =========================================================
+       VISUAL CODEX (12x12 GRID = 144 FUSION COMBINATIONS)
+       ========================================================= */
+    const codexGrid = document.getElementById('codex-grid');
+
+    function populateCodexGrid() {
+      codexGrid.innerHTML = '';
+      for (let m = 1; m <= 12; m++) {
+        for (let a = 0; a < 12; a++) {
+          const month = ZODIAC_MONTHS[m - 1];
+          const animal = CHINESE_ANIMALS[a];
+          const code = `${m}_${a}`;
+          const isUnlocked = state.unlockedCodex.has(code);
+
+          const slot = document.createElement('div');
+          slot.className = `codex-slot ${isUnlocked ? 'unlocked' : 'locked'}`;
+          slot.innerHTML = `
+            <div class="codex-slot-icon">${isUnlocked ? month.glyph + animal.icon : '🔒'}</div>
+            <div class="codex-slot-label">${isUnlocked ? `${month.name.slice(0,3)}-${animal.name.slice(0,3)}` : '???'}</div>
+          `;
+          slot.addEventListener('click', () => {
+            showCodexDetail(month, animal, isUnlocked);
+          });
+          codexGrid.appendChild(slot);
+        }
+      }
+    }
+
+    function showCodexDetail(month, animal, isUnlocked) {
+      document.getElementById('detail-emblem').textContent = isUnlocked ? month.glyph : '🔒';
+      document.getElementById('detail-title').textContent = isUnlocked ? `${month.name}–${animal.name} Guardian` : 'Undiscovered Mythic Fusion';
+      document.getElementById('detail-status').textContent = isUnlocked ? "Recorded in Celestial Archive" : "Locked in Gate Realm";
+      document.getElementById('detail-lore').textContent = isUnlocked ?
+        `Combines the active ${month.tech} constellation power with the ${animal.trait} movement passive.` :
+        `Defeat this guardian in the ${animal.name} realm or month gate to reveal its attributes and cel-shaded portrait.`;
+
+      document.getElementById('modal-codex-detail').classList.add('active');
+    }
+
+    document.getElementById('btn-open-codex').addEventListener('click', () => {
+      populateCodexGrid();
+      document.getElementById('modal-codex').classList.add('active');
+    });
+    document.getElementById('btn-close-codex').addEventListener('click', () => {
+      document.getElementById('modal-codex').classList.remove('active');
+    });
+    document.getElementById('btn-close-detail').addEventListener('click', () => {
+      document.getElementById('modal-codex-detail').classList.remove('active');
+    });
+
+    /* =========================================================
+       SHAREABLE VICTORY SCREEN & IMAGE GENERATOR
+       ========================================================= */
+    function showVictoryScreen() {
+      const elapsedSec = Math.floor((Date.now() - state.campaignStartTime) / 1000);
+      const mins = String(Math.floor(elapsedSec / 60)).padStart(2, '0');
+      const secs = String(elapsedSec % 60).padStart(2, '0');
+
+      document.getElementById('vic-guardian-name').textContent = state.guardianTitle.replace(" Prime", "");
+      document.getElementById('vic-time').textContent = `${mins}:${secs}`;
+      document.getElementById('vic-defeats').textContent = state.totalDefeats;
+      document.getElementById('vic-gates-cleared').textContent = `${state.currentGate} / 12`;
+
+      document.getElementById('modal-victory').classList.add('active');
+    }
+
+    document.getElementById('btn-next-realm').addEventListener('click', () => {
+      state.currentRealmIndex = (state.currentRealmIndex + 1) % 12;
+      state.currentGate = 1;
+      document.getElementById('modal-victory').classList.remove('active');
+      spawnGateEnemy();
+    });
+
+    // Render High-Res 1200x630 Social Share Card to Canvas & Download PNG
+    document.getElementById('btn-download-share-card').addEventListener('click', () => {
+      const cardCanvas = document.getElementById('share-card-canvas');
+      const sctx = cardCanvas.getContext('2d');
+
+      // Background Gradient
+      const bgGrad = sctx.createLinearGradient(0, 0, 1200, 630);
+      bgGrad.addColorStop(0, '#0F111A');
+      bgGrad.addColorStop(0.5, '#161822');
+      bgGrad.addColorStop(1, '#0F111A');
+      sctx.fillStyle = bgGrad;
+      sctx.fillRect(0, 0, 1200, 630);
+
+      // Gold Border Frame
+      sctx.strokeStyle = '#D4AF37';
+      sctx.lineWidth = 8;
+      sctx.strokeRect(24, 24, 1152, 582);
+
+      // Inner Rune Ring
+      sctx.strokeStyle = 'rgba(212,175,55,0.25)';
+      sctx.lineWidth = 2;
+      sctx.beginPath();
+      sctx.arc(600, 315, 260, 0, Math.PI * 2);
+      sctx.stroke();
+
+      // Title & Emblem
+      sctx.fillStyle = '#FFD700';
+      sctx.font = 'bold 44px sans-serif';
+      sctx.textAlign = 'center';
+      sctx.fillText("ZODIAC FUSION ARENA", 600, 110);
+
+      const m = ZODIAC_MONTHS[state.playerMonth - 1];
+      const a = CHINESE_ANIMALS[state.playerAnimalIndex];
+      sctx.font = '72px sans-serif';
+      sctx.fillText(`${m.glyph} ${a.icon}`, 600, 220);
+
+      sctx.fillStyle = '#FFFFFF';
+      sctx.font = 'bold 36px sans-serif';
+      sctx.fillText(state.guardianTitle, 600, 290);
+
+      // Stats Pill Container
+      sctx.fillStyle = '#1A1C22';
+      sctx.fillRect(200, 340, 800, 140);
+      sctx.strokeStyle = '#333741';
+      sctx.lineWidth = 2;
+      sctx.strokeRect(200, 340, 800, 140);
+
+      const elapsedSec = Math.floor((Date.now() - state.campaignStartTime) / 1000);
+      const mins = String(Math.floor(elapsedSec / 60)).padStart(2, '0');
+      const secs = String(elapsedSec % 60).padStart(2, '0');
+
+      sctx.fillStyle = '#9EA1A8';
+      sctx.font = '18px sans-serif';
+      sctx.fillText("CAMPAIGN TIME", 350, 390);
+      sctx.fillText("DEFEATS", 600, 390);
+      sctx.fillText("GATES CONQUERED", 850, 390);
+
+      sctx.fillStyle = '#FFD700';
+      sctx.font = 'bold 34px sans-serif';
+      sctx.fillText(`${mins}:${secs}`, 350, 440);
+      sctx.fillText(`${state.totalDefeats}`, 600, 440);
+      sctx.fillText(`${state.currentGate} / 12`, 850, 440);
+
+      // Play Now Call To Action
+      sctx.fillStyle = '#D4AF37';
+      sctx.font = 'bold 22px sans-serif';
+      sctx.fillText("▶ PLAY NOW & FORGE YOUR BIRTHDATE GUARDIAN", 600, 540);
+
+      // Trigger Download
+      const link = document.createElement('a');
+      link.download = `zodiac-guardian-${Date.now()}.png`;
+      link.href = cardCanvas.toDataURL('image/png');
+      link.click();
+    });
+
+    // Share via Web Share API or Clipboard Fallback
+    document.getElementById('btn-share-social').addEventListener('click', () => {
+      const shareData = {
+        title: "Zodiac Fusion Arena",
+        text: `I conquered the celestial realm as ${state.guardianTitle}! Forge your guardian from your birth month and year:`,
+        url: window.location.href
+      };
+      if (navigator.share) {
+        navigator.share(shareData).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+        alert("Victory announcement & Play Now link copied to clipboard!");
+      }
+    });
+
+    // Start Game Loop
+    requestAnimationFrame(gameLoop);
+    updateCodexCounter();
+
+    // SERVICE WORKER REGISTRATION (AT THE VERY END OF SCRIPT)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('ServiceWorker registered with scope:', reg.scope))
+          .catch(err => console.log('ServiceWorker registration failed:', err));
+      });
+    }
+  </script>
+</body>
+</html>
