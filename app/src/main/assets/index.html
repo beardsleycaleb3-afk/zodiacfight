@@ -800,6 +800,203 @@
       letter-spacing: 0.05em;
     }
 
+    /* =========================================================
+       REALM UNLOCK & 12-REALM MAP TRANSITION SEQUENCE
+       ========================================================= */
+    .realm-unlock-card {
+      background: radial-gradient(circle at 50% 16%, #1c2336 0%, #11131a 70%, #0a0b10 100%);
+      border: 2px solid #D4AF37;
+      border-radius: 24px;
+      padding: 16px 14px;
+      max-width: 360px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 0 50px rgba(212,175,55,0.35);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .realm-fx-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .realm-unlock-badge {
+      font-size: 9.5px;
+      font-weight: 900;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #FFD700;
+      background: rgba(255,215,0,0.14);
+      border: 1px solid rgba(255,215,0,0.5);
+      padding: 4px 14px;
+      border-radius: 999px;
+      margin-bottom: 6px;
+      z-index: 2;
+    }
+    .realm-map-section {
+      width: 100%;
+      margin: 8px 0;
+      z-index: 2;
+    }
+    .realm-map-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      width: 100%;
+    }
+    .realm-node {
+      background: #15171e;
+      border: 1.5px solid #282c37;
+      border-radius: 12px;
+      padding: 6px 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      transition: all 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+      cursor: pointer;
+    }
+    .realm-node-icon {
+      font-size: 20px;
+      line-height: 1.1;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    }
+    .realm-node-name {
+      font-size: 8.5px;
+      font-weight: 700;
+      color: #8c919d;
+      text-transform: uppercase;
+      margin-top: 2px;
+      letter-spacing: 0.04em;
+    }
+    .realm-node-status {
+      font-size: 7px;
+      color: #555a66;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .realm-node.conquered {
+      border-color: #D4AF37;
+      background: linear-gradient(180deg, #2a2515 0%, #15171e 100%);
+      box-shadow: 0 0 14px rgba(212,175,55,0.4);
+    }
+    .realm-node.conquered .realm-node-name {
+      color: #FFD700;
+    }
+    .realm-node.conquered .realm-node-status {
+      color: #4EBA6F;
+    }
+    .realm-conquered-star {
+      position: absolute;
+      top: 2px;
+      right: 3px;
+      font-size: 8px;
+      color: #4EBA6F;
+      font-weight: 900;
+    }
+    .realm-node.locked {
+      opacity: 0.35;
+      filter: grayscale(0.8);
+    }
+    .realm-node.active-current {
+      border-color: #00E5FF;
+      background: #17202c;
+      box-shadow: 0 0 12px rgba(0,229,255,0.4);
+    }
+    .realm-node.illuminating {
+      border-color: #FFD700;
+      background: radial-gradient(circle, #3d3410 0%, #171822 100%);
+      box-shadow: 0 0 25px #FFD700, 0 0 45px rgba(0,229,255,0.7), inset 0 0 15px rgba(255,215,0,0.5);
+      transform: scale(1.1);
+      z-index: 5;
+      animation: realmNodePulse 1.2s infinite alternate ease-in-out;
+    }
+    .realm-node.illuminating .realm-node-icon {
+      animation: iconWiggle 0.6s ease-in-out infinite alternate;
+    }
+    .realm-node.illuminating .realm-node-name {
+      color: #FFF;
+      font-weight: 900;
+    }
+    .realm-node.illuminating .realm-node-status {
+      color: #FFD700;
+    }
+    @keyframes realmNodePulse {
+      0% { box-shadow: 0 0 16px #FFD700, 0 0 25px rgba(0,229,255,0.5); }
+      100% { box-shadow: 0 0 35px #FFD700, 0 0 55px rgba(0,229,255,0.9), inset 0 0 14px #FFD700; }
+    }
+    @keyframes iconWiggle {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.15) rotate(5deg); }
+    }
+    .new-realm-banner {
+      width: 100%;
+      background: #171922;
+      border: 1.5px solid #303542;
+      border-radius: 16px;
+      padding: 10px 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-align: left;
+      z-index: 2;
+      transition: all 0.6s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+    }
+    .new-realm-banner.illuminated {
+      border-color: #FFD700;
+      background: linear-gradient(135deg, #2b2512 0%, #161822 100%);
+      box-shadow: 0 0 24px rgba(255,215,0,0.35);
+    }
+    .new-realm-icon-halo {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: #202430;
+      border: 2px solid #D4AF37;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      flex-shrink: 0;
+    }
+    .halo-ring {
+      position: absolute;
+      inset: -5px;
+      border-radius: 50%;
+      border: 1px dashed #FFD700;
+      animation: spinRune 9s linear infinite;
+      opacity: 0.8;
+    }
+    .new-realm-big-icon {
+      font-size: 26px;
+    }
+    .new-realm-tag {
+      font-size: 8px;
+      font-weight: 900;
+      color: #FFD700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+    .new-realm-name {
+      font-size: 14px;
+      font-weight: 800;
+      color: #FFF;
+      margin: 1px 0;
+    }
+    .new-realm-desc {
+      font-size: 10px;
+      color: #9da3b2;
+      line-height: 1.3;
+    }
+
     /* FLOATING COMBAT TEXT */
     .floating-text {
       position: absolute;
@@ -852,8 +1049,8 @@
         </div>
       </div>
 
-      <div class="hud-realm">
-        <div class="realm-tag" id="hud-realm-name">Realm of the Tiger</div>
+      <div class="hud-realm" id="hud-realm-badge" style="cursor: pointer;" title="Tap to view 12-Realm Map">
+        <div class="realm-tag" id="hud-realm-name">Realm of the Tiger 🗺️</div>
         <div class="gate-number">
           Gate <span id="hud-gate-num">01</span>/12
         </div>
@@ -881,7 +1078,7 @@
               <span>💚</span>
               <div class="heal-charges" id="heal-charges-count">1</div>
             </div>
-            <span class="btn-action-label">Heal (E)</span>
+            <span class="btn-action-label">Heal</span>
           </div>
 
           <!-- DASH BUTTON -->
@@ -900,7 +1097,7 @@
                 <div class="cooldown-overlay" id="sign-cooldown-overlay"></div>
               </div>
             </div>
-            <span class="btn-action-label gold" id="sign-tech-name">Roar (K)</span>
+            <span class="btn-action-label gold" id="sign-tech-name">Sign</span>
           </div>
 
           <!-- BASIC ATTACK CHAIN -->
@@ -908,7 +1105,7 @@
             <div class="btn-strike" id="btn-strike">
               <span>⚔️</span>
             </div>
-            <span class="btn-action-label">Strike (J)</span>
+            <span class="btn-action-label">Strike</span>
           </div>
         </div>
       </div>
@@ -1002,6 +1199,7 @@
           <div class="tut-dot" id="tut-dot-2"></div>
           <div class="tut-dot" id="tut-dot-3"></div>
           <div class="tut-dot" id="tut-dot-4"></div>
+          <div class="tut-dot" id="tut-dot-5"></div>
         </div>
 
         <h2 class="modal-title" id="tut-title">1. Birthdate Fusion Mechanics</h2>
@@ -1076,8 +1274,60 @@
         <div style="display:flex; flex-direction:column; gap:8px; width:100%;">
           <button class="btn-gold-primary" id="btn-download-share-card">📸 Download Share Card (PNG)</button>
           <button class="btn-pill" id="btn-share-social" style="justify-content:center; padding:10px;">🔗 Share to Social Media</button>
+          <button class="btn-gold-primary" id="btn-play-now" style="background:linear-gradient(135deg,#FFD700 0%,#D4AF37 100%); color:#000; font-weight:800;">
+            ▶ Play Now! (New Fusion Quest)
+          </button>
           <button class="btn-gold-primary" id="btn-next-realm" style="background:#2D3139; color:#FFF; border:1px solid #444A55;">
             Advance to Next Realm
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. REALM UNLOCK & 12-REALM MAP MODAL -->
+    <div class="overlay-screen" id="modal-realm-unlock">
+      <div class="realm-unlock-card">
+        <canvas id="realm-fx-canvas" width="360" height="460" class="realm-fx-canvas"></canvas>
+
+        <div class="realm-unlock-badge" id="realm-unlock-badge">✦ REALM XII CONQUERED ✦</div>
+        <h2 class="modal-title" id="realm-unlock-title" style="color:#FFF; font-size:19px; margin-top:0;">Celestial Gate Cleared!</h2>
+        <p class="modal-subtitle" id="realm-unlock-subtitle" style="font-size:11px; margin-bottom:6px; color:#A4AAB8;">
+          All 12 monthly gates completed! Celestial starlight flows to the next realm...
+        </p>
+
+        <!-- 12-REALM MAP GRID -->
+        <div class="realm-map-section">
+          <div class="realm-map-grid" id="realm-map-grid"></div>
+        </div>
+
+        <!-- ILLUMINATING REALM CARD -->
+        <div class="new-realm-banner" id="new-realm-banner">
+          <div class="new-realm-icon-halo" id="new-realm-icon-halo">
+            <div class="halo-ring"></div>
+            <span class="new-realm-big-icon" id="new-realm-big-icon">🐅</span>
+          </div>
+          <div class="new-realm-info" style="flex:1;">
+            <div class="new-realm-tag" id="new-realm-tag">✦ REALM UNLOCKED ✦</div>
+            <h3 class="new-realm-name" id="new-realm-name">Realm of the Tiger</h3>
+            <p class="new-realm-desc" id="new-realm-desc">Gate 01 is unsealed! 12 new monthly zodiac combos await.</p>
+          </div>
+        </div>
+
+        <!-- TOUCH ACTION BUTTONS -->
+        <div style="display:flex; flex-direction:column; gap:7px; width:100%; margin-top:10px; z-index:2;">
+          <button class="btn-gold-primary" id="btn-enter-new-realm" style="background:linear-gradient(135deg,#FFD700 0%,#D4AF37 100%); color:#000; font-weight:800;">
+            ⚔️ Enter Next Realm Now →
+          </button>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px;">
+            <button class="btn-pill" id="btn-replay-realm-seq" style="justify-content:center; padding:8px; font-size:10px;">
+              ✨ Replay Unlock
+            </button>
+            <button class="btn-pill" id="btn-view-realm-stats" style="justify-content:center; padding:8px; font-size:10px;">
+              🏆 Victory Card
+            </button>
+          </div>
+          <button class="btn-pill" id="btn-close-realm-map" style="display:none; justify-content:center; padding:7px; font-size:10px; color:#9EA1A8;">
+            ✕ Close Map
           </button>
         </div>
       </div>
@@ -1177,6 +1427,12 @@
           setTimeout(() => this.playTone(f, 'triangle', 0.4, 0.3), i * 140);
         });
       }
+      playRealmUnlock() {
+        const arpeggio = [261.63, 329.63, 392.00, 523.25, 659.25, 783.99, 1046.50];
+        arpeggio.forEach((freq, idx) => {
+          setTimeout(() => this.playTone(freq, 'triangle', 0.5, 0.28), idx * 110);
+        });
+      }
     }
     const audio = new AudioController();
 
@@ -1191,6 +1447,8 @@
       // Campaign Progression
       currentRealmIndex: 2, // Tiger Realm
       currentGate: 1, // 1 to 12
+      conqueredRealms: new Set([0, 1]), // Previously conquered realms (Rat, Ox)
+      unlockedRealms: new Set([0, 1, 2]), // Unlocked and accessible realms
       totalDefeats: 0,
       campaignStartTime: Date.now(),
       constellationShards: 0,
@@ -1224,7 +1482,10 @@
 
       // Controls
       joystick: { active: false, startX: 0, startY: 0, curX: 0, curY: 0, dx: 0, dy: 0 },
-      keys: {}
+      isPractice: false,
+      codexDates: {},
+      viewWidth: 350,
+      viewHeight: 720
     };
 
     // Helper: Compute Chinese Animal from Year
@@ -1232,32 +1493,126 @@
       return ((year - 2020) % 12 + 12) % 12;
     }
 
-    // Initialize Codex with some saved progress or defaults
+    // Initialize Codex & Saved Defeat Dates
     try {
       const savedCodex = localStorage.getItem('zodiac_fusion_codex');
       if (savedCodex) {
         JSON.parse(savedCodex).forEach(id => state.unlockedCodex.add(id));
       }
+      const savedDates = localStorage.getItem('zodiac_fusion_dates');
+      if (savedDates) {
+        state.codexDates = JSON.parse(savedDates);
+      }
     } catch(e) {}
 
     /* =========================================================
-       CANVAS & RENDERING ENGINE
+       CANVAS & RENDERING ENGINE (720x1440 RES / 350x720 VIEWPORT)
        ========================================================= */
     const canvas = document.getElementById('arena-canvas');
     const ctx = canvas.getContext('2d');
 
     function resizeCanvas() {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      const container = document.getElementById('game-container') || document.body;
+      const rect = container.getBoundingClientRect();
+      const dpr = Math.max(window.devicePixelRatio || 2, 2);
+
+      state.viewWidth = rect.width || 350;
+      state.viewHeight = rect.height || 720;
+
+      canvas.width = Math.round(state.viewWidth * dpr);
+      canvas.height = Math.round(state.viewHeight * dpr);
+      canvas.style.width = `${state.viewWidth}px`;
+      canvas.style.height = `${state.viewHeight}px`;
+
+      ctx.resetTransform();
+      ctx.scale(dpr, dpr);
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // Spawn Enemy for Current Gate & Realm
+    // Spawn Enemy for Current Gate & Realm (Includes Practice Dummy & Chimera Bosses)
     function spawnGateEnemy() {
       const realmAnimal = CHINESE_ANIMALS[state.currentRealmIndex % 12];
-      const gateMonth = ZODIAC_MONTHS[(state.currentGate - 1) % 12];
 
+      // 1. PRACTICE DUMMY SPARRING ENEMY
+      if (state.isPractice) {
+        state.enemy = {
+          name: "Astral Training Dummy",
+          month: { id: 0, name: "Astral", glyph: "✦", color: "#FFD700", tech: "Light Spark" },
+          animal: { name: "Dummy", emoji: "🎯", icon: "🎯", trait: "Stationary Practice Target", speedMult: 0, index: 0 },
+          x: 0,
+          y: -85,
+          radius: 22,
+          hp: 90,
+          maxHp: 90,
+          isShadow: false,
+          isDummy: true,
+          isChimera: false,
+          transforming: false,
+          speed: 0.2,
+          attackTimer: 0,
+          attackTelegraph: 0,
+          telegraphType: 'circle',
+          facingAngle: Math.PI / 2,
+          wobble: 0
+        };
+
+        const bossHud = document.getElementById('hud-boss');
+        bossHud.style.display = 'flex';
+        document.getElementById('hud-boss-name').textContent = "Astral Training Puppet (Practice)";
+        document.getElementById('hud-boss-phase').textContent = "Practice Target";
+        document.getElementById('hud-boss-phase').className = "boss-phase-tag";
+        document.getElementById('hud-boss-hp').className = "bar-boss-fill";
+        document.getElementById('hud-boss-hp').style.width = '100%';
+
+        document.getElementById('hud-realm-name').textContent = "Sparring Sanctum";
+        document.getElementById('hud-gate-num').textContent = "TUT";
+        return;
+      }
+
+      // 2. GATE 13: YEARLY REALM CHIMERA BOSS / FINAL SHADOW CHIMERA
+      if (state.currentGate >= 13) {
+        const isFinalTitan = (state.currentRealmIndex === 11);
+        const chimeraTitle = isFinalTitan ?
+          "Chronos All-Zodiac Chimera Shadow Titan" :
+          `${realmAnimal.name} Realm Chimera Boss`;
+
+        state.enemy = {
+          name: chimeraTitle,
+          month: { id: 99, name: "All-Signs", glyph: "❂", color: "#FFD700", tech: "Omni-Burst" },
+          animal: realmAnimal,
+          x: 0,
+          y: -105,
+          radius: 30,
+          hp: isFinalTitan ? 420 : 280,
+          maxHp: isFinalTitan ? 420 : 280,
+          isShadow: false,
+          isChimera: true,
+          isFinalBoss: isFinalTitan,
+          transforming: false,
+          speed: 2.2,
+          attackTimer: 0,
+          attackTelegraph: 0,
+          telegraphType: 'cone',
+          facingAngle: Math.PI / 2,
+          wobble: 0
+        };
+
+        const bossHud = document.getElementById('hud-boss');
+        bossHud.style.display = 'flex';
+        document.getElementById('hud-boss-name').textContent = state.enemy.name;
+        document.getElementById('hud-boss-phase').textContent = isFinalTitan ? "FINAL TITAN PHASE" : "CHIMERA BOSS";
+        document.getElementById('hud-boss-phase').className = "boss-phase-tag";
+        document.getElementById('hud-boss-hp').className = "bar-boss-fill";
+        document.getElementById('hud-boss-hp').style.width = '100%';
+
+        document.getElementById('hud-realm-name').textContent = isFinalTitan ? "The Astral Void" : `Apex of ${realmAnimal.name}`;
+        document.getElementById('hud-gate-num').textContent = isFinalTitan ? "MAX" : "CHM";
+        return;
+      }
+
+      // 3. REGULAR GATE 1-12 GUARDIAN
+      const gateMonth = ZODIAC_MONTHS[(state.currentGate - 1) % 12];
       state.enemy = {
         name: `${gateMonth.name}–${realmAnimal.name}`,
         month: gateMonth,
@@ -1265,11 +1620,12 @@
         x: 0,
         y: -100,
         radius: 24,
-        hp: 150,
-        maxHp: 150,
+        hp: 150 + (state.currentRealmIndex * 12),
+        maxHp: 150 + (state.currentRealmIndex * 12),
         isShadow: false,
+        isChimera: false,
         transforming: false,
-        speed: 1.8,
+        speed: 1.8 + (state.currentRealmIndex * 0.05),
         attackTimer: 0,
         attackTelegraph: 0,
         telegraphType: 'cone',
@@ -1302,18 +1658,19 @@
       audio.playShadowTransform();
 
       // Screen text
-      addFloatingText(state.enemy.x, state.enemy.y - 20, "SHADOW AWAKENING!", "#9B51E0");
+      addFloatingText(state.enemy.x, state.enemy.y - 20, state.enemy.isChimera ? "SHADOW CHIMERA ERUPTION!" : "SHADOW AWAKENING!", "#9B51E0");
 
       setTimeout(() => {
         if (!state.enemy) return;
         state.enemy.isShadow = true;
         state.enemy.transforming = false;
-        state.enemy.hp = 220;
-        state.enemy.maxHp = 220;
+        const shadowHp = state.enemy.isChimera ? Math.round(state.enemy.maxHp * 1.3) : 220;
+        state.enemy.hp = shadowHp;
+        state.enemy.maxHp = shadowHp;
         state.enemy.speed = 2.6;
         flash.style.opacity = '0';
 
-        document.getElementById('hud-boss-phase').textContent = "Shadow Phase";
+        document.getElementById('hud-boss-phase').textContent = state.enemy.isChimera ? "Shadow Chimera Phase" : "Shadow Phase";
         document.getElementById('hud-boss-phase').className = "boss-phase-tag shadow";
         document.getElementById('hud-boss-hp').className = "bar-boss-fill shadow";
         document.getElementById('hud-boss-hp').style.width = '100%';
@@ -1328,12 +1685,15 @@
       }, 1400);
     }
 
-    // Record Defeat in Codex
+    // Record Defeat in Codex with Timestamp
     function recordCodexEntry(monthId, animalIdx) {
+      if (monthId < 1 || monthId > 12) return;
       const code = `${monthId}_${animalIdx}`;
       state.unlockedCodex.add(code);
+      state.codexDates[code] = new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
       try {
         localStorage.setItem('zodiac_fusion_codex', JSON.stringify(Array.from(state.unlockedCodex)));
+        localStorage.setItem('zodiac_fusion_dates', JSON.stringify(state.codexDates));
       } catch(e) {}
       updateCodexCounter();
     }
@@ -1349,8 +1709,10 @@
     }
 
     function addFloatingText(x, y, text, color = "#FFF") {
-      const screenX = canvas.width / 2 + x;
-      const screenY = canvas.height / 2 + y;
+      const centerX = (state.viewWidth || 350) / 2;
+      const centerY = (state.viewHeight ? (state.viewHeight - 70) / 2 : 320);
+      const screenX = centerX + x;
+      const screenY = centerY + y;
       const el = document.createElement('div');
       el.className = 'floating-text';
       el.textContent = text;
@@ -1358,7 +1720,7 @@
       el.style.left = `${screenX}px`;
       el.style.top = `${screenY}px`;
       document.getElementById('game-container').appendChild(el);
-      setTimeout(() => el.remove(), 600);
+      setTimeout(() => el.remove(), 650);
     }
 
     /* =========================================================
@@ -1488,6 +1850,21 @@
       document.getElementById('hud-boss-hp').style.width = `${pct}%`;
 
       if (state.enemy.hp <= 0) {
+        if (state.enemy.isDummy) {
+          audio.playFanfare();
+          addFloatingText(0, 0, "PRACTICE DUMMY DEFEATED!", "#FFD700");
+          state.enemy = null;
+          document.getElementById('hud-boss').style.display = 'none';
+          setTimeout(() => {
+            state.isPractice = false;
+            state.currentGate = 1;
+            state.player.hp = state.player.maxHp;
+            updatePlayerHpUI();
+            spawnGateEnemy();
+          }, 1500);
+          return;
+        }
+
         if (!state.enemy.isShadow) {
           triggerShadowPhase();
         } else {
@@ -1498,15 +1875,23 @@
 
     function onGateVictory() {
       audio.playFanfare();
-      recordCodexEntry(state.enemy.month.id, state.enemy.animal.index);
+      if (state.enemy && state.enemy.month && state.enemy.animal) {
+        recordCodexEntry(state.enemy.month.id, state.enemy.animal.index);
+      }
 
       // Award shard
       state.constellationShards++;
       updateShardsUI();
 
-      // Check if realm finished (12 gates)
+      // Check if player completed all 12 gates of the realm
       if (state.currentGate >= 12) {
-        showVictoryScreen();
+        addFloatingText(0, 0, "✦ ALL 12 GATES CONQUERED! ✦", "#FFD700");
+        setTimeout(() => {
+          const cur = state.currentRealmIndex;
+          const next = (state.currentRealmIndex + 1) % 12;
+          triggerRealmUnlockSequence(cur, next);
+        }, 1500);
+        return;
       } else {
         addFloatingText(0, 0, "GATE CLEARED!", "#FFD700");
         setTimeout(() => {
@@ -1581,24 +1966,13 @@
     function update(dt) {
       const p = state.player;
 
-      // Movement calculation from Joystick & Keyboard
+      // Movement strictly driven by Touch Virtual Analog Stick (Mobile touch-only)
       let moveX = 0;
       let moveY = 0;
 
       if (state.joystick.active) {
         moveX = state.joystick.dx;
         moveY = state.joystick.dy;
-      } else {
-        if (state.keys['KeyW'] || state.keys['ArrowUp']) moveY -= 1;
-        if (state.keys['KeyS'] || state.keys['ArrowDown']) moveY += 1;
-        if (state.keys['KeyA'] || state.keys['ArrowLeft']) moveX -= 1;
-        if (state.keys['KeyD'] || state.keys['ArrowRight']) moveX += 1;
-
-        const len = Math.hypot(moveX, moveY);
-        if (len > 0) {
-          moveX /= len;
-          moveY /= len;
-        }
       }
 
       // Horse passive: +25% speed
@@ -1926,39 +2300,38 @@
     stickZone.addEventListener('touchend', resetStick);
     stickZone.addEventListener('touchcancel', resetStick);
 
-    // Mouse fallback for joystick
-    let isMouseDownOnStick = false;
-    stickZone.addEventListener('mousedown', (e) => {
-      isMouseDownOnStick = true;
-      handleStickMove(e.clientX, e.clientY);
-    });
-    window.addEventListener('mousemove', (e) => {
-      if (isMouseDownOnStick) handleStickMove(e.clientX, e.clientY);
-    });
-    window.addEventListener('mouseup', () => {
-      if (isMouseDownOnStick) {
-        isMouseDownOnStick = false;
-        resetStick();
-      }
-    });
+    // Touch-only button listener helper (Instant 0ms latency + Haptics)
+    function bindTouchAction(target, actionCallback) {
+      const el = typeof target === 'string' ? document.getElementById(target) : target;
+      if (!el) return;
 
-    // Button Bindings
-    document.getElementById('btn-strike').addEventListener('click', performStrike);
-    document.getElementById('btn-dash').addEventListener('click', performDash);
-    document.getElementById('btn-sign').addEventListener('click', performSignTechnique);
-    document.getElementById('btn-heal').addEventListener('click', performHeal);
+      const trigger = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (navigator.vibrate) {
+          try { navigator.vibrate(14); } catch (err) {}
+        }
+        el.classList.add('touch-active');
+        if (actionCallback) actionCallback(e);
+      };
 
-    // Keyboard Shortcuts
-    window.addEventListener('keydown', (e) => {
-      state.keys[e.code] = true;
-      if (e.code === 'KeyJ') performStrike();
-      if (e.code === 'Space') performDash();
-      if (e.code === 'KeyK') performSignTechnique();
-      if (e.code === 'KeyE') performHeal();
-    });
-    window.addEventListener('keyup', (e) => {
-      state.keys[e.code] = false;
-    });
+      const release = (e) => {
+        el.classList.remove('touch-active');
+      };
+
+      el.addEventListener('touchstart', trigger, { passive: false });
+      el.addEventListener('touchend', release, { passive: false });
+      el.addEventListener('touchcancel', release);
+      el.addEventListener('click', (e) => {
+        if (!e.defaultPrevented && actionCallback) actionCallback(e);
+      });
+    }
+
+    // Touch-only action buttons
+    bindTouchAction('btn-strike', performStrike);
+    bindTouchAction('btn-dash', performDash);
+    bindTouchAction('btn-sign', performSignTechnique);
+    bindTouchAction('btn-heal', performHeal);
 
     /* =========================================================
        CREATION & 5-SECOND ASSEMBLY SEQUENCE
@@ -1982,7 +2355,7 @@
     yearInput.addEventListener('input', updateCreationPreview);
     updateCreationPreview();
 
-    document.getElementById('btn-confirm-forge').addEventListener('click', () => {
+    bindTouchAction('btn-confirm-forge', () => {
       state.playerMonth = parseInt(monthSelect.value);
       state.playerYear = parseInt(yearInput.value) || 2000;
       state.playerAnimalIndex = getAnimalIndexForYear(state.playerYear);
@@ -2043,7 +2416,7 @@
       }, 5000);
     }
 
-    document.getElementById('btn-reforge').addEventListener('click', () => {
+    bindTouchAction('btn-reforge', () => {
       document.getElementById('modal-creation').classList.add('active');
     });
 
@@ -2057,19 +2430,24 @@
         desc: "Your <strong>Birth Month</strong> bestows your active Constellation Sign Technique (e.g. Leo Roar, Aquarius Fan).<br><br>Your <strong>Birth Year Animal</strong> grants your movement silhouette, dash trait (Dragon fire, Rabbit double dash), and combat passives!"
       },
       {
-        title: "2. Movement & Arena Navigation",
+        title: "2. Touch Movement (Virtual Stick)",
         icon: "🕹️",
-        desc: "Navigate the circular celestial clock arena using the <strong>Virtual Analog Stick</strong> on the left, or <strong>W, A, S, D / Arrow Keys</strong> on desktop.<br><br>Observe the 12 engraved zodiac marks on the perimeter to gauge distance."
+        desc: "Glide your guardian smoothly across the circular celestial arena using the <strong>Virtual Analog Stick</strong> on the bottom-left of your phone screen.<br><br>Thumb drag direction governs movement and weapon facing orientation."
       },
       {
-        title: "3. 3-Hit Weapon Chain & Strike",
+        title: "3. 3-Hit Strike Combo",
         icon: "⚔️",
-        desc: "Tap <strong>Strike</strong> or press <strong>J / Left Click</strong> to unleash your weapon combo.<br><br>Combo hits deal escalating damage with crescent starlight hit-stops. Finishers trigger animal bonuses!"
+        desc: "Tap the ⚔️ <strong>Strike Button</strong> on the right to unleash a rhythmic 3-hit weapon combo.<br><br>Each consecutive hit deals escalating damage with starlight crescent hit-stops and sparks!"
       },
       {
         title: "4. Dash & Sign Technique",
         icon: "✦",
-        desc: "Tap <strong>Dash (Space)</strong> for a 0.3s burst with 0.18s invulnerability.<br><br>Tap your <strong>Zodiac Sign (K)</strong> to execute your signature ability on a 6s cooldown!"
+        desc: "Tap the ✦ <strong>Dash Button</strong> for an instant burst with 0.18s invulnerability.<br><br>Tap the glowing <strong>Zodiac Sign Button</strong> to unleash your birth month active power on a 6s cooldown!"
+      },
+      {
+        title: "5. Practice Sparring Session",
+        icon: "🎯",
+        desc: "Ready to test your touch controls? Tap below to summon a stationary <strong>Astral Training Dummy</strong> into the arena for practice striking, dodging, and testing techniques before entering Realm 1!"
       }
     ];
 
@@ -2080,33 +2458,48 @@
       document.getElementById('tut-icon').innerHTML = step.icon;
       document.getElementById('tut-desc').innerHTML = step.desc;
 
-      for (let i = 1; i <= 4; i++) {
-        document.getElementById(`tut-dot-${i}`).className = i - 1 === currentTutStep ? 'tut-dot active' : 'tut-dot';
+      for (let i = 1; i <= 5; i++) {
+        const dot = document.getElementById(`tut-dot-${i}`);
+        if (dot) dot.className = i - 1 === currentTutStep ? 'tut-dot active' : 'tut-dot';
       }
 
       document.getElementById('tut-btn-prev').style.display = currentTutStep > 0 ? 'block' : 'none';
-      document.getElementById('tut-btn-next').textContent = currentTutStep === 3 ? "Complete & Battle" : "Next Step";
+      document.getElementById('tut-btn-next').textContent = currentTutStep === 4 ? "⚔️ Start Practice Fight!" : "Next Step";
     }
 
-    document.getElementById('btn-open-tutorial').addEventListener('click', () => {
+    function openTutorial() {
       currentTutStep = 0;
       renderTutStep();
       document.getElementById('modal-tutorial').classList.add('active');
-    });
-    document.getElementById('tut-btn-prev').addEventListener('click', () => {
+    }
+
+    function prevTutorialStep() {
       if (currentTutStep > 0) {
         currentTutStep--;
         renderTutStep();
       }
-    });
-    document.getElementById('tut-btn-next').addEventListener('click', () => {
-      if (currentTutStep < 3) {
+    }
+
+    function nextTutorialStep() {
+      if (currentTutStep < 4) {
         currentTutStep++;
         renderTutStep();
       } else {
         document.getElementById('modal-tutorial').classList.remove('active');
+        // Launch Practice fight
+        startPracticeFight();
       }
-    });
+    }
+
+    function startPracticeFight() {
+      state.isPractice = true;
+      spawnGateEnemy();
+      addFloatingText(0, 0, "PRACTICE SPARRING STARTED!", "#FFD700");
+    }
+
+    bindTouchAction('btn-open-tutorial', openTutorial);
+    bindTouchAction('tut-btn-prev', prevTutorialStep);
+    bindTouchAction('tut-btn-next', nextTutorialStep);
 
     /* =========================================================
        VISUAL CODEX (12x12 GRID = 144 FUSION COMBINATIONS)
@@ -2128,7 +2521,7 @@
             <div class="codex-slot-icon">${isUnlocked ? month.glyph + animal.icon : '🔒'}</div>
             <div class="codex-slot-label">${isUnlocked ? `${month.name.slice(0,3)}-${animal.name.slice(0,3)}` : '???'}</div>
           `;
-          slot.addEventListener('click', () => {
+          bindTouchAction(slot, () => {
             showCodexDetail(month, animal, isUnlocked);
           });
           codexGrid.appendChild(slot);
@@ -2137,52 +2530,370 @@
     }
 
     function showCodexDetail(month, animal, isUnlocked) {
-      document.getElementById('detail-emblem').textContent = isUnlocked ? month.glyph : '🔒';
+      const code = `${month.id}_${animal.index}`;
+      const encDate = state.codexDates[code] || "Recorded in Campaign";
+      document.getElementById('detail-emblem').textContent = isUnlocked ? (month.glyph + " " + animal.icon) : '🔒';
       document.getElementById('detail-title').textContent = isUnlocked ? `${month.name}–${animal.name} Guardian` : 'Undiscovered Mythic Fusion';
-      document.getElementById('detail-status').textContent = isUnlocked ? "Recorded in Celestial Archive" : "Locked in Gate Realm";
-      document.getElementById('detail-lore').textContent = isUnlocked ?
-        `Combines the active ${month.tech} constellation power with the ${animal.trait} movement passive.` :
-        `Defeat this guardian in the ${animal.name} realm or month gate to reveal its attributes and cel-shaded portrait.`;
+      document.getElementById('detail-status').textContent = isUnlocked ? `Defeated • ${encDate}` : "Locked in Gate Realm";
+      document.getElementById('detail-lore').innerHTML = isUnlocked ?
+        `<strong>Active Technique:</strong> ${month.tech}<br><strong>Animal Trait:</strong> ${animal.trait}<br><br>A celestial guardian channeling the starry aura of ${month.name} fused with the ${animal.name} spirit.` :
+        `Conquer this guardian in the ${animal.name} realm or monthly gate to unlock its cel-shaded codex archives and recorded attributes.`;
 
       document.getElementById('modal-codex-detail').classList.add('active');
     }
 
-    document.getElementById('btn-open-codex').addEventListener('click', () => {
+    bindTouchAction('btn-open-codex', () => {
       populateCodexGrid();
       document.getElementById('modal-codex').classList.add('active');
     });
-    document.getElementById('btn-close-codex').addEventListener('click', () => {
+    bindTouchAction('btn-close-codex', () => {
       document.getElementById('modal-codex').classList.remove('active');
     });
-    document.getElementById('btn-close-detail').addEventListener('click', () => {
+    bindTouchAction('btn-close-detail', () => {
       document.getElementById('modal-codex-detail').classList.remove('active');
     });
 
     /* =========================================================
        SHAREABLE VICTORY SCREEN & IMAGE GENERATOR
        ========================================================= */
-    function showVictoryScreen() {
+    function showVictoryScreen(isFinalTitan = false) {
       const elapsedSec = Math.floor((Date.now() - state.campaignStartTime) / 1000);
       const mins = String(Math.floor(elapsedSec / 60)).padStart(2, '0');
       const secs = String(elapsedSec % 60).padStart(2, '0');
 
+      const vicBadge = document.getElementById('vic-badge');
+      const vicTitle = document.querySelector('#modal-victory .modal-title');
+      const vicSub = document.getElementById('vic-sub');
+      const btnNextRealm = document.getElementById('btn-next-realm');
+
+      if (isFinalTitan) {
+        vicBadge.textContent = "👑";
+        vicTitle.textContent = "Final Shadow Titan Overthrown!";
+        vicSub.textContent = "You conquered all 12 Yearly Realms and conquered the Chronos All-Zodiac Chimera!";
+        if (btnNextRealm) btnNextRealm.textContent = "Ascend Again (New NG+ Cycle)";
+      } else {
+        vicBadge.textContent = "🏆";
+        vicTitle.textContent = `${CHINESE_ANIMALS[state.currentRealmIndex].name} Realm Conquered!`;
+        vicSub.textContent = "Yearly Chimera Boss defeated! Advance into the next celestial realm.";
+        if (btnNextRealm) btnNextRealm.textContent = `Advance to ${CHINESE_ANIMALS[(state.currentRealmIndex + 1) % 12].name} Realm`;
+      }
+
       document.getElementById('vic-guardian-name').textContent = state.guardianTitle.replace(" Prime", "");
       document.getElementById('vic-time').textContent = `${mins}:${secs}`;
       document.getElementById('vic-defeats').textContent = state.totalDefeats;
-      document.getElementById('vic-gates-cleared').textContent = `${state.currentGate} / 12`;
+      document.getElementById('vic-gates-cleared').textContent = isFinalTitan ? "12 / 12 Realms" : `${state.currentGate} / 12 Gates`;
 
       document.getElementById('modal-victory').classList.add('active');
     }
 
-    document.getElementById('btn-next-realm').addEventListener('click', () => {
-      state.currentRealmIndex = (state.currentRealmIndex + 1) % 12;
-      state.currentGate = 1;
+    function advanceToNextRealm() {
       document.getElementById('modal-victory').classList.remove('active');
+      const cur = state.currentRealmIndex;
+      const next = (state.currentRealmIndex + 1) % 12;
+      triggerRealmUnlockSequence(cur, next);
+    }
+
+    function playNowNewRun() {
+      document.getElementById('modal-victory').classList.remove('active');
+      document.getElementById('modal-creation').classList.add('active');
+    }
+
+    bindTouchAction('btn-next-realm', advanceToNextRealm);
+    bindTouchAction('btn-play-now', playNowNewRun);
+
+    /* =========================================================
+       REALM UNLOCK TRANSITION SEQUENCE & 12-REALM MAP ENGINE
+       ========================================================= */
+    let realmFxRaf = null;
+    let realmStars = [];
+    let realmSparks = [];
+    let realmBeamProgress = 0;
+    let realmBeamActive = false;
+    let realmBeamFrom = { x: 0, y: 0 };
+    let realmBeamTo = { x: 0, y: 0 };
+
+    function renderRealmMapGrid(illuminatingIdx = -1) {
+      const grid = document.getElementById('realm-map-grid');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      CHINESE_ANIMALS.forEach((animal, idx) => {
+        const node = document.createElement('div');
+        const isConquered = state.conqueredRealms.has(idx);
+        const isUnlocked = state.unlockedRealms.has(idx);
+        const isCurrent = (idx === state.currentRealmIndex);
+        const isIlluminating = (idx === illuminatingIdx);
+
+        node.className = 'realm-node';
+        node.id = `realm-node-${idx}`;
+
+        if (isIlluminating) {
+          node.classList.add('illuminating');
+        } else if (isConquered) {
+          node.classList.add('conquered');
+        } else if (isCurrent || isUnlocked) {
+          node.classList.add('active-current');
+        } else {
+          node.classList.add('locked');
+        }
+
+        let statusText = isConquered ? 'Cleared' : (isUnlocked ? 'Unlocked' : 'Locked');
+        if (isIlluminating) statusText = 'UNLOCKED!';
+
+        node.innerHTML = `
+          ${isConquered ? '<span class="realm-conquered-star">✓</span>' : ''}
+          <div class="realm-node-icon">${animal.icon}</div>
+          <div class="realm-node-name">${animal.name}</div>
+          <div class="realm-node-status">${statusText}</div>
+        `;
+
+        bindTouchAction(node, () => {
+          showRealmInfoPreview(idx);
+        });
+
+        grid.appendChild(node);
+      });
+    }
+
+    function showRealmInfoPreview(idx) {
+      const animal = CHINESE_ANIMALS[idx];
+      const isConquered = state.conqueredRealms.has(idx);
+      const isUnlocked = state.unlockedRealms.has(idx);
+      document.getElementById('new-realm-big-icon').textContent = animal.icon;
+      document.getElementById('new-realm-name').textContent = `Realm of the ${animal.name}`;
+      document.getElementById('new-realm-tag').textContent = isConquered
+        ? '✦ REALM MASTERED ✦'
+        : (isUnlocked ? '✦ REALM ACCESSIBLE ✦' : '✦ REALM SEALED 🔒 ✦');
+      document.getElementById('new-realm-desc').textContent = isConquered
+        ? `All 12 monthly gates mastered! Passive trait: ${animal.trait}.`
+        : (isUnlocked
+          ? `12 monthly gates & shadow chimera challenge. Trait: ${animal.trait}.`
+          : `Defeat earlier realm gates to shatter this celestial seal.`);
+    }
+
+    function getNodeCenter(idx) {
+      const canvas = document.getElementById('realm-fx-canvas');
+      const node = document.getElementById(`realm-node-${idx}`);
+      if (!canvas || !node) return { x: 180, y: 150 };
+      const cRect = canvas.getBoundingClientRect();
+      const nRect = node.getBoundingClientRect();
+      return {
+        x: (nRect.left + nRect.width / 2) - cRect.left,
+        y: (nRect.top + nRect.height / 2) - cRect.top
+      };
+    }
+
+    function initRealmFxCanvas(fromIdx, toIdx) {
+      const canvas = document.getElementById('realm-fx-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      if (realmFxRaf) cancelAnimationFrame(realmFxRaf);
+
+      // Starfield background
+      realmStars = [];
+      for (let i = 0; i < 40; i++) {
+        realmStars.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          radius: Math.random() * 1.5 + 0.5,
+          alpha: Math.random() * 0.8 + 0.2,
+          speed: Math.random() * 0.02 + 0.01
+        });
+      }
+
+      realmSparks = [];
+      realmBeamProgress = 0;
+      realmBeamActive = true;
+      realmBeamFrom = getNodeCenter(fromIdx);
+      realmBeamTo = getNodeCenter(toIdx);
+
+      function loop() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw twinkling stars
+        realmStars.forEach(s => {
+          s.alpha += s.speed;
+          if (s.alpha > 1 || s.alpha < 0.2) s.speed = -s.speed;
+          ctx.fillStyle = `rgba(255, 215, 0, ${Math.max(0, Math.min(1, s.alpha))})`;
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Draw constellation starlight beam
+        if (realmBeamActive) {
+          realmBeamProgress = Math.min(1, realmBeamProgress + 0.025);
+          const curX = realmBeamFrom.x + (realmBeamTo.x - realmBeamFrom.x) * realmBeamProgress;
+          const curY = realmBeamFrom.y + (realmBeamTo.y - realmBeamFrom.y) * realmBeamProgress;
+
+          ctx.save();
+          ctx.strokeStyle = 'rgba(255, 215, 0, 0.75)';
+          ctx.lineWidth = 2.5;
+          ctx.shadowColor = '#FFD700';
+          ctx.shadowBlur = 10;
+          ctx.beginPath();
+          ctx.moveTo(realmBeamFrom.x, realmBeamFrom.y);
+          ctx.lineTo(curX, curY);
+          ctx.stroke();
+
+          ctx.fillStyle = '#00E5FF';
+          ctx.shadowColor = '#00E5FF';
+          ctx.shadowBlur = 14;
+          ctx.beginPath();
+          ctx.arc(curX, curY, 4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+
+          if (realmBeamProgress < 1 && Math.random() < 0.6) {
+            realmSparks.push({
+              x: curX,
+              y: curY,
+              vx: (Math.random() - 0.5) * 3,
+              vy: (Math.random() - 0.5) * 3,
+              life: 1,
+              color: Math.random() < 0.5 ? '#FFD700' : '#00E5FF'
+            });
+          }
+        }
+
+        // Draw sparks
+        for (let i = realmSparks.length - 1; i >= 0; i--) {
+          const sp = realmSparks[i];
+          sp.x += sp.vx;
+          sp.y += sp.vy;
+          sp.life -= 0.035;
+          if (sp.life <= 0) {
+            realmSparks.splice(i, 1);
+            continue;
+          }
+          ctx.fillStyle = sp.color;
+          ctx.globalAlpha = sp.life;
+          ctx.beginPath();
+          ctx.arc(sp.x, sp.y, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1.0;
+
+        realmFxRaf = requestAnimationFrame(loop);
+      }
+
+      loop();
+    }
+
+    function spawnRealmBurstParticles(nodeIdx) {
+      const center = getNodeCenter(nodeIdx);
+      for (let i = 0; i < 35; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = Math.random() * 4.5 + 1.5;
+        realmSparks.push({
+          x: center.x,
+          y: center.y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 1.0,
+          color: Math.random() < 0.4 ? '#00E5FF' : (Math.random() < 0.7 ? '#FFD700' : '#FFF')
+        });
+      }
+    }
+
+    function triggerRealmUnlockSequence(fromRealm = state.currentRealmIndex, toRealm = (state.currentRealmIndex + 1) % 12) {
+      state.conqueredRealms.add(fromRealm);
+      state.unlockedRealms.add(toRealm);
+
+      const fromAnimal = CHINESE_ANIMALS[fromRealm];
+      const toAnimal = CHINESE_ANIMALS[toRealm];
+
+      const modal = document.getElementById('modal-realm-unlock');
+      modal.classList.add('active');
+
+      document.getElementById('realm-unlock-badge').textContent = `✦ REALM XII CONQUERED ✦`;
+      document.getElementById('realm-unlock-title').textContent = `Realm of the ${fromAnimal.name} Mastered!`;
+      document.getElementById('realm-unlock-subtitle').textContent = `All 12 gates cleared! Celestial starlight flows to the next realm...`;
+      document.getElementById('btn-close-realm-map').style.display = 'none';
+      document.getElementById('new-realm-banner').classList.remove('illuminated');
+
+      // Stage 1: Render 12-realm map with conquered realm
+      renderRealmMapGrid(-1);
+      showRealmInfoPreview(fromRealm);
+
+      setTimeout(() => {
+        initRealmFxCanvas(fromRealm, toRealm);
+      }, 50);
+
+      // Stage 2 (800ms): Starlight beam gathers toward next realm
+      setTimeout(() => {
+        document.getElementById('realm-unlock-subtitle').textContent = `Constellation rays illuminate the Earthly Branch of the ${toAnimal.name}...`;
+        audio.playTone(330, 'sine', 0.35, 0.25);
+      }, 800);
+
+      // Stage 3 (1800ms): THE NEXT REALM MAP ICON ILLUMINATES!
+      setTimeout(() => {
+        renderRealmMapGrid(toRealm);
+        document.getElementById('new-realm-banner').classList.add('illuminated');
+        document.getElementById('new-realm-big-icon').textContent = toAnimal.icon;
+        document.getElementById('new-realm-name').textContent = `Realm of the ${toAnimal.name}`;
+        document.getElementById('new-realm-tag').textContent = `✦ REALM ILLUMINATED & UNLOCKED ✦`;
+        document.getElementById('new-realm-desc').textContent = `Gate 01 is open! 12 new monthly zodiac combos await your guardian.`;
+        document.getElementById('btn-enter-new-realm').textContent = `⚔️ Enter Realm of the ${toAnimal.name} →`;
+
+        spawnRealmBurstParticles(toRealm);
+        audio.playRealmUnlock();
+
+        if (navigator.vibrate) {
+          try { navigator.vibrate([40, 80, 120]); } catch(e) {}
+        }
+      }, 1800);
+    }
+
+    function openRealmMapModal() {
+      renderRealmMapGrid(-1);
+      const curAnimal = CHINESE_ANIMALS[state.currentRealmIndex];
+      showRealmInfoPreview(state.currentRealmIndex);
+      document.getElementById('realm-unlock-badge').textContent = `✦ 12-REALM CELESTIAL MAP ✦`;
+      document.getElementById('realm-unlock-title').textContent = `Realm of the ${curAnimal.name}`;
+      document.getElementById('realm-unlock-subtitle').textContent = `Gate ${state.currentGate}/12 in progress. Tap any realm node to inspect traits.`;
+      document.getElementById('btn-close-realm-map').style.display = 'block';
+      document.getElementById('btn-enter-new-realm').textContent = `⚔️ Resume Gate ${state.currentGate}`;
+      document.getElementById('modal-realm-unlock').classList.add('active');
+    }
+
+    function enterUnlockedRealm() {
+      const nextRealm = (state.currentRealmIndex + 1) % 12;
+      state.currentRealmIndex = nextRealm;
+      state.currentGate = 1;
+      state.hazards = [];
+      state.player.hp = state.player.maxHp;
+      updatePlayerHpUI();
+      document.getElementById('modal-realm-unlock').classList.remove('active');
+      if (realmFxRaf) cancelAnimationFrame(realmFxRaf);
       spawnGateEnemy();
+      audio.playFanfare();
+      addFloatingText(0, 0, `ENTERED REALM OF THE ${CHINESE_ANIMALS[nextRealm].name.toUpperCase()}!`, "#FFD700");
+    }
+
+    bindTouchAction('btn-enter-new-realm', enterUnlockedRealm);
+
+    bindTouchAction('btn-replay-realm-seq', () => {
+      const cur = state.currentRealmIndex;
+      const next = (state.currentRealmIndex + 1) % 12;
+      triggerRealmUnlockSequence(cur, next);
     });
 
+    bindTouchAction('btn-view-realm-stats', () => {
+      document.getElementById('modal-realm-unlock').classList.remove('active');
+      if (realmFxRaf) cancelAnimationFrame(realmFxRaf);
+      showVictoryScreen(state.currentRealmIndex === 11);
+    });
+
+    bindTouchAction('btn-close-realm-map', () => {
+      document.getElementById('modal-realm-unlock').classList.remove('active');
+      if (realmFxRaf) cancelAnimationFrame(realmFxRaf);
+    });
+
+    bindTouchAction('hud-realm-badge', openRealmMapModal);
+
     // Render High-Res 1200x630 Social Share Card to Canvas & Download PNG
-    document.getElementById('btn-download-share-card').addEventListener('click', () => {
+    function generateShareCard() {
       const cardCanvas = document.getElementById('share-card-canvas');
       const sctx = cardCanvas.getContext('2d');
 
@@ -2254,22 +2965,30 @@
       link.download = `zodiac-guardian-${Date.now()}.png`;
       link.href = cardCanvas.toDataURL('image/png');
       link.click();
-    });
+    }
+
+    bindTouchAction('btn-download-share-card', generateShareCard);
 
     // Share via Web Share API or Clipboard Fallback
-    document.getElementById('btn-share-social').addEventListener('click', () => {
+    function shareSocialResults() {
       const shareData = {
         title: "Zodiac Fusion Arena",
-        text: `I conquered the celestial realm as ${state.guardianTitle}! Forge your guardian from your birth month and year:`,
+        text: `I conquered the celestial realm as ${state.guardianTitle}! Defeats: ${state.totalDefeats}. Forge your guardian from your birthdate and play now:`,
         url: window.location.href
       };
       if (navigator.share) {
         navigator.share(shareData).catch(() => {});
       } else {
-        navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
-        alert("Victory announcement & Play Now link copied to clipboard!");
+        try {
+          navigator.clipboard.writeText(`${shareData.text} ${shareData.url}`);
+          alert("Victory announcement & Play Now link copied to clipboard!");
+        } catch (e) {
+          alert(`Guardian Victory: ${state.guardianTitle}`);
+        }
       }
-    });
+    }
+
+    bindTouchAction('btn-share-social', shareSocialResults);
 
     // Start Game Loop
     requestAnimationFrame(gameLoop);
