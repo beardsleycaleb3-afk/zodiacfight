@@ -1,9 +1,11 @@
 // Zodiac Fusion Arena - PWA Service Worker
-const CACHE_NAME = 'zodiac-fusion-v1';
+const CACHE_NAME = 'zodiac-fusion-v2';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './manifest.json',
+  './game.ts',
+  './game.js',
   './sw.js',
   './icon192.png',
   './icon512.png'
